@@ -2,29 +2,33 @@
 
 from flask import Blueprint, request, jsonify
 import os
-from ml.yolo_model import YOLOModel
+from ultralytics import YOLO
 import ml.train_model as train
 import ml.hello as hello
+import base64
+import cv2
+import numpy as np
+from app import socketio
+from ml.yolo_model import process_video_frames
+
 
 main = Blueprint('main', __name__)
-model = YOLOModel() 
 
 @main.route('/detect', methods=['POST'])
-def detect():
+def upload_video():
+    # Handle video upload
+    print("Triggered")
     if 'video' not in request.files:
-        return jsonify({"error": "No video file found"}), 400
+        return jsonify({'error': 'No video file provided'}), 400
 
-    video = request.files['video']
-    video_path = os.path.join('uploads', video.filename)
-    video.save(video_path)
+    video_file = request.files['video']
+    video_path = os.path.join('uploads', video_file.filename)
+    video_file.save(video_path)
 
-    # Detect objects in video
-    results = model.detect_objects(video_path)
-
-    # Clean up the saved video file after processing
-    os.remove(video_path)
-
-    return jsonify("\n".join(results))
+    # Start processing the video frames
+    socketio.start_background_task(target=process_video_frames, video_path=video_path)
+    
+    return jsonify({'status': 'Video uploaded and processing started'}), 200
    
 
 
@@ -50,3 +54,5 @@ def status():
 @main.route('/hello', methods=['GET'])
 def helloRoute():
     return jsonify(hello.hello_test())
+
+

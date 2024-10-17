@@ -1,3 +1,7 @@
-Flask
+Flask==2.2.3
 ultralytics
 opencv-python
+Flask-SocketIO==5.0.2
+eventlet
+Werkzeug==2.2.2
+flask-cors

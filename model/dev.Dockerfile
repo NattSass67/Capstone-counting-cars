@@ -20,13 +20,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variables for Flask
-ENV FLASK_APP=flask_server.py
+# ENV FLASK_APP=flask_server.py
 # Enable hot-reload for Flask
-ENV FLASK_ENV=development  
+# ENV FLASK_ENV=development  
 
 
 # Expose port 5000 for Flask
 EXPOSE 5000
 
-# Command to run Flask on container start
-CMD ["flask", "run", "--host=0.0.0.0"]
+# Command to run your application with Eventlet
+CMD ["python", "app.py"]
