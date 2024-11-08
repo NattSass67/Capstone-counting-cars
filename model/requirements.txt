@@ -5,3 +5,4 @@ Flask-SocketIO==5.0.2
 eventlet
 Werkzeug==2.2.2
 flask-cors
+deep-sort-realtime
