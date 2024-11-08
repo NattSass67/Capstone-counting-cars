@@ -192,7 +192,22 @@ def process_video_frames(video_path, line_position=350, line_orientation='horizo
     cap.release()
     print("Video processing completed.")
     
+
+def format_detection(detection):
+    #detection: Result object from frame.
     
+    boxes = detection.boxes.numpy()
+    bounding_boxes = boxes.xywh
+    confidence = boxes.conf
+    classes = boxes.cls
+    #print(bounding_boxes)
+    #print(confidence)
+    #print(classes)
+    
+    #Cars and motorcycles.
+    
+    
+    return list(zip(bounding_boxes,confidence,classes))   
 
 
 def process_video_frames_deepSort(video_path, line_position=350, line_orientation='horizontal'):
@@ -232,7 +247,7 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
             if boxes is None:
                 continue
             for box in boxes:
-                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = box.xywh[0]
                 confidence = box.conf[0]
                 class_id = int(box.cls[0])
                 label = model.names[class_id]
@@ -288,7 +303,7 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
             detection = {
                 'track_id': track_id,
                 'label': label,
-                'bbox': [int(x1), int(y1), int(x2)-int(x1), int(y2)-int(y1)],
+                'bbox': [int(x1)-10, int(y1)-10, int(x2)-10, int(y2)-10],
                 'centroid': centroid
             }
             detections_to_send.append(detection)
