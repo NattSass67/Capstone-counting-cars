@@ -36,7 +36,7 @@ def format_detection(detection):
     return list(zip(bounding_boxes,confidence,classes))   
 
 def cross_line(pos1,pos2, line_start, line_finish):
-    box = min(line_start[0],line_finish[0]), max(line_start[0],line_finish[0]), min(line_start[1],line_finish[1]), max(line_start[1],line_finish[1])
+    box = min(line_start[0],line_finish[0])-20, max(line_start[0],line_finish[0])+20, min(line_start[1],line_finish[1])-20, max(line_start[1],line_finish[1])+20
     within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
     #Within the box.
     #The line is ax1 + by1 = c, ax2+by2 = c
