@@ -10,25 +10,8 @@ import numpy as np
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 
-model_name = 'yolov10x.pt'
+model_name = 'yolov10s.pt'
 model = YOLO(model_name) 
-
-
-def format_detection(detection):
-    #detection: Result object from frame.
-    
-    boxes = detection.boxes.numpy()
-    bounding_boxes = boxes.xywh
-    confidence = boxes.conf
-    classes = boxes.cls
-    #print(bounding_boxes)
-    #print(confidence)
-    #print(classes)
-    
-    #Cars and motorcycles.
-    
-    
-    return list(zip(bounding_boxes,confidence,classes))   
 
 def cross_line(pos1,pos2, line_start, line_finish):
     box = min(line_start[0],line_finish[0])-20, max(line_start[0],line_finish[0])+20, min(line_start[1],line_finish[1])-20, max(line_start[1],line_finish[1])+20
@@ -48,7 +31,7 @@ def cross_line(pos1,pos2, line_start, line_finish):
     first_line_geq = a*pos1[0] + b*pos1[1] >= c
     second_line_geq = a*pos2[0] + b*pos2[1] >= c
     
-    return (first_line_geq != second_line_geq)
+    return first_line_geq , second_line_geq
 
 
 def process_video_frames_deepSort(video_path, line_position=350, line_orientation='horizontal'):
@@ -62,7 +45,8 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
     frame_skip = 3  # Process every 3rd frame
 
     # Initialize tracking variables
-    label_counts = {}  # label -> crossing count
+    label_counts_in = {}  # label -> in count
+    label_counts_out = {}  # label -> out count
     previous_centroids = {}  # track_id -> previous centroid
 
     # Initialize DeepSort
@@ -130,17 +114,23 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
                     line_start = (line_position, 0)
                     line_finish = (line_position, frame.shape[0])
 
-                if cross_line(prev_centroid, centroid, line_start, line_finish):
-                    # Increment the label count
-                    if label not in label_counts:
-                        label_counts[label] = 0
-                    label_counts[label] += 1
+                First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
+
+                if First != Second:
+                    if First == 1:  # "In" crossing
+                        if label not in label_counts_in:
+                            label_counts_in[label] = 0
+                        label_counts_in[label] += 1
+                    elif First == 0:  # "Out" crossing
+                        if label not in label_counts_out:
+                            label_counts_out[label] = 0
+                        label_counts_out[label] += 1
 
             # Update previous centroid
             previous_centroids[track_id] = centroid
 
         # Print updated label counts
-        print(f"Current crossing counts: {label_counts}")
+        print(f"Current crossing counts: {label_counts_in}")
 
         # Encode frame for visualization (optional)
         _, buffer = cv2.imencode('.jpg', frame)
@@ -150,7 +140,8 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
         socketio.emit('frame-processed', {
             'frame': frame_base64,
             'detections': detections_to_send,
-            'label_counts': label_counts,
+            'label_counts_in': label_counts_in,
+            'label_counts_out': label_counts_out,
             'line_orientation': line_orientation,
             'line_position': line_position
         })

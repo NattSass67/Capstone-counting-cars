@@ -23,7 +23,10 @@ const VideoUploader = () => {
 
     newSocket.on("frame-processed", (data) => {
       console.log("Received processed frame", data);
-      setResult(data.label_counts);
+      setResult({
+        label_counts_in: data.label_counts_in || {},
+        label_counts_out: data.label_counts_out || {},
+      });
 
       const canvas = canvasRef.current;
       if (canvas) {
@@ -141,7 +144,13 @@ const VideoUploader = () => {
       ></canvas>
 
       {processing && <div className="text-gray-800 mt-8">Processing video...</div>}
-      <div className="text-gray-800 mt-8">{JSON.stringify(result)}</div>
+      <div className="text-gray-800 mt-8">
+        <h2 className="font-semibold">In Counts</h2>
+        <pre>{JSON.stringify(result.label_counts_in, null, 2)}</pre>
+
+        <h2 className="font-semibold mt-4">Out Counts</h2>
+        <pre>{JSON.stringify(result.label_counts_out, null, 2)}</pre>
+      </div>
     </div>
   );
 };
