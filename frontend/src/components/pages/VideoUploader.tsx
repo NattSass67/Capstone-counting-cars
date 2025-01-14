@@ -140,8 +140,8 @@ const VideoUploader = () => {
         className="w-full max-w-3xl mx-auto border-2 mt-4 border-gray-300 rounded-lg shadow-md"
       ></canvas>
 
-      {processing && <div>Processing video...</div>}
-      <div className="mt-8">{JSON.stringify(result)}</div>
+      {processing && <div className="text-gray-800 mt-8">Processing video...</div>}
+      <div className="text-gray-800 mt-8">{JSON.stringify(result)}</div>
     </div>
   );
 };
