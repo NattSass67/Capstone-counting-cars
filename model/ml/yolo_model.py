@@ -35,6 +35,26 @@ def format_detection(detection):
     
     return list(zip(bounding_boxes,confidence,classes))   
 
+def cross_line(pos1,pos2, line_start, line_finish):
+    box = min(line_start[0],line_finish[0])-20, max(line_start[0],line_finish[0])+20, min(line_start[1],line_finish[1])-20, max(line_start[1],line_finish[1])+20
+    within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
+    #Within the box.
+    #The line is ax1 + by1 = c, ax2+by2 = c
+    # a(x1-x2) + b(y1-y2) = 0
+    # a = -b(y2-y1)/(x2-x1)
+    # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
+    #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
+    
+    a = line_finish[1]-line_start[1]
+    b = line_start[0]-line_finish[0]
+    
+    c = line_start[0]*line_finish[1] - line_finish[0]*line_start[1] 
+    
+    first_line_geq = a*pos1[0] + b*pos1[1] >= c
+    second_line_geq = a*pos2[0] + b*pos2[1] >= c
+    
+    return within_box and  (first_line_geq != second_line_geq)
+
 
 def process_video_frames_deepSort(video_path, line_position=350, line_orientation='horizontal'):
     print("process_video_deepsort_called")
@@ -156,3 +176,5 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
 
     cap.release()
     print("Video processing completed.")
+    
+#Using track.mean could allow one to ascertain the velocity, but let's do the velocity from just positions alone.
