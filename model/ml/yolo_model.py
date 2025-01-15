@@ -14,7 +14,7 @@ model_name = 'yolov10s.pt'
 model = YOLO(model_name) 
 
 def cross_line(pos1,pos2, line_start, line_finish):
-    box = min(line_start[0],line_finish[0])-20, max(line_start[0],line_finish[0])+20, min(line_start[1],line_finish[1])-20, max(line_start[1],line_finish[1])+20
+    box = min(line_start[0],line_finish[0])-40, max(line_start[0],line_finish[0])+40, min(line_start[1],line_finish[1])-40, max(line_start[1],line_finish[1])+40
     within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
     #Within the box.
     #The line is ax1 + by1 = c, ax2+by2 = c
@@ -22,6 +22,7 @@ def cross_line(pos1,pos2, line_start, line_finish):
     # a = -b(y2-y1)/(x2-x1)
     # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
     #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
+    if not within_box: return 0,0
     
     a = line_finish[1]-line_start[1]
     b = line_start[0]-line_finish[0]
@@ -61,8 +62,10 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
         if frame_count % frame_skip != 0:
             continue  # Skip this frame
 
-        # Perform object detection using YOLOv8
-        results = model(frame)
+        resized_frame = cv2.resize(frame, (yolo_input_size, yolo_input_size))
+
+        # Perform object detection using YOLOv8 on the resized frame
+        results = model(resized_frame)
 
         # Prepare detections for DeepSort
         detections = []
@@ -71,12 +74,20 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
             if boxes is None:
                 continue
             for box in boxes:
-                x1, y1, x2, y2 = box.xywh[0]
+                x, y, w, h = box.xywh[0]
                 confidence = box.conf[0]
                 class_id = int(box.cls[0])
                 label = model.names[class_id]
+                scale_x = original_width / yolo_input_size
+                scale_y = original_height / yolo_input_size
 
-                bbox = [x1, y1, x2, y2]
+                # Scale bounding box coordinates to match the original size
+                w_scaled = int(w * scale_x)
+                h_scaled = int(h * scale_y)
+                x_scaled = int(x * scale_x)-w_scaled/2
+                y_scaled = int(y * scale_y)-h_scaled/2
+
+                bbox = [x_scaled, y_scaled, w_scaled, h_scaled]
                 detection = [bbox, float(confidence), class_id]
                 detections.append(detection)
 
