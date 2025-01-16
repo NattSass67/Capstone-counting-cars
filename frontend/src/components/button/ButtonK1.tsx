@@ -1,0 +1,34 @@
+import ButtonK0 from "./ButtonK0";
+
+export default function ButtonK1({
+  showIconLeft = false,
+  IconLeft = null,
+  text,
+  showIconRight = false,
+  IconRight = null,
+  className = "",
+  type = "button",
+}: {
+  showIconLeft?: boolean;
+  showIconRight?: boolean;
+  text: string;
+  IconLeft?: React.ReactNode;
+  IconRight?: React.ReactNode;
+  className?: string;
+  type?: "button" | "submit" | "reset";
+}) {
+  return (
+    <ButtonK0
+      showIconLeft={showIconLeft}
+      IconLeft={IconLeft}
+      text={text}
+      showIconRight={showIconRight}
+      IconRight={IconRight}
+      className={
+        className +
+        "border-[3px] border-yellow-950 text-white text-xl font-bold bg-orange-500 rounded-[999px] "
+      }
+      type={type}
+    />
+  );
+}
