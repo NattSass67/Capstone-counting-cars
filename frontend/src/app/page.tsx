@@ -6,11 +6,12 @@ import TestComponent from "@/components/TestComponent";
 import CrossIcon from "@/components/Icon/CrossIcon";
 import CheckMarkIcon from "@/components/Icon/CheckMarkIcon";
 import JobsPanel from "@/components/JobsPanel";
+import ButtonK1 from "@/components/button/ButtonK1";
 
 export default function Home() {
   return (
     <div className="">
-      <AppHeader />
+      {/* <AppHeader /> */}
       <div className="flex flex-col space-y-[16px]">
         <div className="py-[24px] flex items-center w-full">
           <h1 className="text-2xl  w-full text-center font-bold text-amber-900">
