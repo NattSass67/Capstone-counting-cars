@@ -10,11 +10,11 @@ import numpy as np
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 
-model_name = 'yolov10s.pt'
+model_name = 'yolov10n.pt'
 model = YOLO(model_name) 
 
 def cross_line(pos1,pos2, line_start, line_finish):
-    box = min(line_start[0],line_finish[0])-40, max(line_start[0],line_finish[0])+40, min(line_start[1],line_finish[1])-40, max(line_start[1],line_finish[1])+40
+    box = min(line_start[0],line_finish[0])-50, max(line_start[0],line_finish[0])+50, min(line_start[1],line_finish[1])-50, max(line_start[1],line_finish[1])+50
     within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
     #Within the box.
     #The line is ax1 + by1 = c, ax2+by2 = c
@@ -23,7 +23,6 @@ def cross_line(pos1,pos2, line_start, line_finish):
     # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
     #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
     if not within_box: return 0,0
-    
     a = line_finish[1]-line_start[1]
     b = line_start[0]-line_finish[0]
     
