@@ -30,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppHeader />
-        <Container>{children}</Container>
+        <Container className="w-full">
+          <AppHeader />
+          {children}
+        </Container>
       </body>
     </html>
   );
