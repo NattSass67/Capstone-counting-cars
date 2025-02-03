@@ -48,7 +48,7 @@ export default function SingleSubJob({
           className="overflow-hidden"
         />
         <div className="flex flex-col space-y-[24px] px-[24px] py-[16px] rounded-[24px] border-[2.5px] border-yellow-950  items-center flex-grow">
-          <h1 className=" font-bold text-2xl flex-none text-amber-900">
+          <h1 className=" font-bold text-xl flex-none text-amber-900">
             {statustext}
           </h1>
           {icon}

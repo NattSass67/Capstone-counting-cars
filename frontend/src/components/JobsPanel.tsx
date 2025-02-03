@@ -2,6 +2,8 @@ import { job } from "@/service/interface";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import SingleJob from "./SingleJob";
+import ButtonK1 from "./button/ButtonK1";
+import { FiPlus } from "react-icons/fi";
 
 export default function JobsPanel() {
   /*export interface job {
@@ -80,6 +82,14 @@ export default function JobsPanel() {
       {mockdata.map((job, index) => (
         <SingleJob key={index} SingleJob={job} number={index + 1} />
       ))}
+      <div className="flex flex-row justify-center">
+        <ButtonK1
+          text="เพิ่มงานใหม่"
+          className="px-[24px] border-[3px] border-yellow-950 text-white text-xl font-bold bg-orange-500 rounded-[999px] "
+          IconLeft={<FiPlus size={32} />}
+          showIconLeft={true}
+        />
+      </div>
     </div>
   );
 }

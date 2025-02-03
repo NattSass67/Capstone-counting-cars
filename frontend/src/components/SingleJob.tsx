@@ -3,6 +3,8 @@ import Image from "next/image";
 import SingleSubJob from "./SingleSubJob";
 import { formatThaiDate } from "@/service/formatThaiDate";
 import CrossIcon from "./Icon/CrossIcon";
+import ButtonK1 from "./button/ButtonK1";
+import { MdOutlineFileDownload } from "react-icons/md";
 
 export default function SingleJob({
   SingleJob,
@@ -47,6 +49,11 @@ export default function SingleJob({
             imageUrl={subjob.videoUrl}
           />
         ))}
+        <ButtonK1
+          text="Download ผลลัพท์ทั้งหมด เป็น .csv ไฟล์เดียว"
+          showIconLeft={true}
+          IconLeft={<MdOutlineFileDownload size={32} />}
+        />
       </div>
     </div>
   );
