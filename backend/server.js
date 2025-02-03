@@ -25,7 +25,7 @@ app.post("/api/upload", upload.single("video"), async (req, res) => {
     // Create a form to send the video to http://localhost:5000/detect
     const form = new FormData();
     form.append("video", fs.createReadStream(req.file.path));
-
+    
     console.log("Sending....")
     // Forward the video to the detection server
     const response = await axios.post("http://localhost:5000/detect", form, {
