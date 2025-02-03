@@ -1,36 +1,30 @@
-'use client'
-import { forwardRef} from 'react'
-import clsx from 'clsx'
-
-
+"use client";
+import { forwardRef } from "react";
+import clsx from "clsx";
 
 export const ContainerOuter = forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'>
+  React.ElementRef<"div">,
+  React.ComponentPropsWithoutRef<"div">
 >(function OuterContainer({ className, children, ...props }, ref) {
-
-  
   return (
-    <div ref={ref} className={clsx('', className)} {...props}>
-      <div className={`mx-auto w-fullmax-w-7xl px-6 md:px-10 xl:px-20`}>{children}</div>
+    <div ref={ref} className={clsx("", className)} {...props}>
+      <div className={`mx-auto w-fullmax-w-7xl px-6 md:px-10 xl:px-20`}>
+        {children}
+      </div>
     </div>
-  )
-})
+  );
+});
 
 export const ContainerInner = forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'>
+  React.ElementRef<"div">,
+  React.ComponentPropsWithoutRef<"div">
 >(function InnerContainer({ className, children, ...props }, ref) {
   return (
-    <div
-      ref={ref}
-      className={clsx('relative', className)}
-      {...props}
-    >
+    <div ref={ref} className={clsx("relative", className)} {...props}>
       <div className="mx-auto max-w-screen-2xl ">{children}</div>
     </div>
-  )
-})
+  );
+});
 
 export const Container = forwardRef<
   React.ElementRef<typeof ContainerOuter>,
@@ -40,5 +34,5 @@ export const Container = forwardRef<
     <ContainerOuter ref={ref} {...props}>
       <ContainerInner>{children}</ContainerInner>
     </ContainerOuter>
-  )
-})
+  );
+});

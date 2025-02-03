@@ -1,9 +1,5 @@
-
-
-import { Container } from '@/components/components-gpts/layout/Container'
-import { NavItem } from './HeaderGPT'
-
-
+import { Container } from "@/components/components-gpts/layout/Container";
+import { NavItem } from "./HeaderGPT";
 
 export function Footer() {
   return (
@@ -27,5 +23,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
