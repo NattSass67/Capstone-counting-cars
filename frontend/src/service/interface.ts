@@ -13,3 +13,15 @@ export interface job {
   direction: string;
   subjob: subjob[];
 }
+
+export interface jobK2 extends job {
+  id: number;
+}
+
+export interface jobTable {
+  id: number;
+  name: string;
+  intersectionName: string;
+  date: string;
+  countingState: string;
+}
