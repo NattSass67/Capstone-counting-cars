@@ -26,7 +26,7 @@ export default function ButtonK1({
       IconRight={IconRight}
       className={
         className +
-        "border-[3px] border-yellow-950 text-white text-xl font-bold bg-orange-500 rounded-[999px] "
+        "border-[3px] border-yellow-950 text-white text-xl font-bold bg-orange-500 rounded-[999px] hover:bg-orange-600 "
       }
       type={type}
     />
