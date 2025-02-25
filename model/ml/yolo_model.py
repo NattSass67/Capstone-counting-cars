@@ -10,7 +10,7 @@ import numpy as np
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 
-model_name = 'yolo11l.pt'
+model_name = 'yolo11s.pt'
 model = YOLO(model_name) 
 
 def line_constants(line_starts, line_finishes):
@@ -75,7 +75,7 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
     label_counts_in = {}  # label -> in count
     label_counts_out = {}  # label -> out count
     previous_centroids = {}  # track_id -> previous centroid
-
+    lines_crossed = {}
     # Initialize DeepSort
     tracker = DeepSort(max_age=30,bgr=False)
     
@@ -165,54 +165,52 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             
             
             if track_id in previous_centroids:
-                
-                prev_centroid = previous_centroids[track_id]
-                #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
-                
-                #if label not in in_crossing_labelled:
-                #    in_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
-                #if label not in out_crossing_labelled:
-                #    out_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
-                
-                #if track_id not in out_crossed:
-                #    out_crossed[track_id] = np.zeros(line_grid_SHAPE)
-                #if track_id not in in_crossed:
-                #    in_crossed[track_id] = np.zeros(line_grid_SHAPE)
-                
-                #out_crossings += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
-                #out_crossing_labelled[label] += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
-                #out_crossed[track_id] = np.logical_or(out_crossed[track_id],new_out_crosses)
-                #in_crossings += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
-                #in_crossing_labelled[label] += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
-                #in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
-                #in_crossings += new_in_crosses
-                
-                
-                if line_orientation == 'horizontal':
-                    line_start = (0, line_position[0])
-                    line_finish = (frame.shape[1], line_position[1])
-                else:
-                    line_start = (line_position[0], 0)
-                    line_finish = (line_position[1], frame.shape[0])
+                if track_id not in lines_crossed:
+                    lines_crossed[track_id] = []
+                for line_id, (line_position,line_orientation) in enumerate(zip(line_positions,line_orientations)):
+                    prev_centroid = previous_centroids[track_id]
+                    #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
+                    
+                    #if label not in in_crossing_labelled:
+                    #    in_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    #if label not in out_crossing_labelled:
+                    #    out_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    
+                    #if track_id not in out_crossed:
+                    #    out_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    #if track_id not in in_crossed:
+                    #    in_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    
+                    #out_crossings += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossing_labelled[label] += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossed[track_id] = np.logical_or(out_crossed[track_id],new_out_crosses)
+                    #in_crossings += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossing_labelled[label] += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
+                    #in_crossings += new_in_crosses
+                    
+                    
+                    if line_orientation == 'horizontal':
+                        line_start = (0, line_position[0])
+                        line_finish = (frame.shape[1], line_position[1])
+                    else:
+                        line_start = (line_position[0], 0)
+                        line_finish = (line_position[1], frame.shape[0])
+    
+                    First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
 
-                First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
-
-                if First != Second:
-                    if First == 1:  # "In" crossing
-                        if label not in label_counts_in:
-                            label_counts_in[label] = 0
-                        label_counts_in[label] += 1
-                    elif First == 0:  # "Out" crossing
-                        if label not in label_counts_out:
-                            label_counts_out[label] = 0
-                        label_counts_out[label] += 1
+                    if First != Second:
+                        if First == 1:  # "In" crossing
+                            lines_crossed[track_id].append(("in",line_id))
+                        elif First == 0:  # "Out" crossing
+                            lines_crossed[track_id].append(("out",line_id))
                 
 
             # Update previous centroid
             previous_centroids[track_id] = centroid
             
         
-        
+        print({i:j for (i,j) in lines_crossed.items() if j})
         #print("Out and in crossings")
         #out_line_loc = out_crossings.argsort()[-1000]
         #in_line_loc = in_crossings.argsort()[-1000]
@@ -239,8 +237,8 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             'detections': detections_to_send,
             'label_counts_in': label_counts_in,
             'label_counts_out': label_counts_out,
-            'line_orientation': line_orientation,
-            'line_position': line_position
+            'line_orientation': line_orientations,
+            'line_position': line_positions
         })
 
         eventlet.sleep(0.001)
