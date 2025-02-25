@@ -61,7 +61,7 @@ def cross_line_numpy(pos1,pos2, abc):
     return np.logical_and(np.logical_not(first_line_geq), second_line_geq),  np.logical_and(first_line_geq, np.logical_not(second_line_geq))
 
 
-def process_video_frames_deepSort(video_path, line_position=(320,360), line_orientation='horizontal'):
+def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_orientations=['horizontal']):
     print("process_video_deepsort_called")
     original_width = 1280  # Original video width
     original_height = 720  # Original video height
