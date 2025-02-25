@@ -77,7 +77,7 @@ def process_video_frames_deepSort(video_path, line_position=(320,360), line_orie
     previous_centroids = {}  # track_id -> previous centroid
 
     # Initialize DeepSort
-    tracker = DeepSort(max_age=30)
+    tracker = DeepSort(max_age=30,bgr=False)
     
     #line_starts = np.linspace(200, 500,100)
     #line_stops = np.linspace(200, 500,100)
