@@ -60,8 +60,8 @@ def cross_line_numpy(pos1,pos2, abc):
     #Out crossing and in crossing.
     return np.logical_and(np.logical_not(first_line_geq), second_line_geq),  np.logical_and(first_line_geq, np.logical_not(second_line_geq))
 
-
-def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_orientations=['horizontal']):
+# lines = [((x1, y1), (x2, y2)),...]
+def process_video_frames_deepSort(video_path, lines=[((0, 320), (1280, 320)),((0, 360), (1280, 360)),((0, 0), (1280, 720))]):
     print("process_video_deepsort_called")
     original_width = 1280  # Original video width
     original_height = 720  # Original video height
@@ -167,7 +167,7 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             if track_id in previous_centroids:
                 if track_id not in lines_crossed:
                     lines_crossed[track_id] = []
-                for line_id, (line_position,line_orientation) in enumerate(zip(line_positions,line_orientations)):
+                for line_id, (line_start, line_finish) in enumerate(lines):
                     prev_centroid = previous_centroids[track_id]
                     #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
                     
@@ -189,13 +189,8 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
                     #in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
                     #in_crossings += new_in_crosses
                     
-                    
-                    if line_orientation == 'horizontal':
-                        line_start = (0, line_position[0])
-                        line_finish = (frame.shape[1], line_position[1])
-                    else:
-                        line_start = (line_position[0], 0)
-                        line_finish = (line_position[1], frame.shape[0])
+                    line_start, line_finish = lines[line_id]
+
     
                     First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
 
@@ -237,8 +232,7 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             'detections': detections_to_send,
             'label_counts_in': label_counts_in,
             'label_counts_out': label_counts_out,
-            'line_orientation': line_orientations,
-            'line_position': line_positions
+            'lines': lines
         })
 
         eventlet.sleep(0.001)
