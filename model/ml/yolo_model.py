@@ -60,6 +60,19 @@ def cross_line_numpy(pos1,pos2, abc):
     #Out crossing and in crossing.
     return np.logical_and(np.logical_not(first_line_geq), second_line_geq),  np.logical_and(first_line_geq, np.logical_not(second_line_geq))
 
+
+def get_result(lines_crossed):
+    DICT = {}
+    for i in lines_crossed.values():
+        label = i[0]
+        key = tuple(i[1:])
+        if key not in DICT:
+            DICT[key] = {}
+        if label not in DICT[key]:
+            DICT[key][label] = 0
+        DICT[key][label] += 1
+    return DICT
+    
 # lines = [((x1, y1), (x2, y2)),...]
 def process_video_frames_deepSort(video_path, lines=[((0, 320), (1280, 320)),((0, 360), (1280, 360)),((0, 0), (1280, 720))]):
     print("process_video_deepsort_called")
@@ -205,7 +218,7 @@ def process_video_frames_deepSort(video_path, lines=[((0, 320), (1280, 320)),((0
             previous_centroids[track_id] = centroid
             
         
-        print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
+        #print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
         #print("Out and in crossings")
         #out_line_loc = out_crossings.argsort()[-1000]
         #in_line_loc = in_crossings.argsort()[-1000]
@@ -236,7 +249,8 @@ def process_video_frames_deepSort(video_path, lines=[((0, 320), (1280, 320)),((0
         })
 
         eventlet.sleep(0.001)
-
+    
+    print("result",get_result(lines_crossed))
     cap.release()
     print("Video processing completed.")
 
