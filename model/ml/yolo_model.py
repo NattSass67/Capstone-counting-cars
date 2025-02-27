@@ -166,7 +166,7 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             
             if track_id in previous_centroids:
                 if track_id not in lines_crossed:
-                    lines_crossed[track_id] = []
+                    lines_crossed[track_id] = [label]
                 for line_id, (line_position,line_orientation) in enumerate(zip(line_positions,line_orientations)):
                     prev_centroid = previous_centroids[track_id]
                     #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
@@ -210,7 +210,7 @@ def process_video_frames_deepSort(video_path, line_positions=[(320,360)], line_o
             previous_centroids[track_id] = centroid
             
         
-        print({i:j for (i,j) in lines_crossed.items() if j})
+        print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
         #print("Out and in crossings")
         #out_line_loc = out_crossings.argsort()[-1000]
         #in_line_loc = in_crossings.argsort()[-1000]
