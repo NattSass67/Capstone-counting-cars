@@ -205,7 +205,7 @@ def process_video_frames_deepSort(video_path, lines=[((0, 320), (1280, 320)),((0
             previous_centroids[track_id] = centroid
             
         
-        print({i:j for (i,j) in lines_crossed.items() if j})
+        print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
         #print("Out and in crossings")
         #out_line_loc = out_crossings.argsort()[-1000]
         #in_line_loc = in_crossings.argsort()[-1000]
