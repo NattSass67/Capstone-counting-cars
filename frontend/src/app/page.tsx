@@ -5,7 +5,7 @@ import JobsPanel from "@/components/JobsPanel";
 import Banner from "@/components/Banner";
 import FeatureSection from "@/components/FeatureSection";
 import { APPNAME, AppDescriptionFull } from "@/constant/constValue";
-import JobsPanelK2 from "@/components/JobsPanelK2";
+import JobsPanelK3 from "@/components/JobsPanelK3";
 
 export default function Home() {
   return (
@@ -20,7 +20,7 @@ export default function Home() {
           </h1>
           <h1 className="text-base text-orange-950 ">{AppDescriptionFull}</h1>
         </div>
-        <JobsPanelK2 />
+        <JobsPanelK3 />
       </div>
     </div>
     //
