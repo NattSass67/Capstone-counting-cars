@@ -136,8 +136,7 @@ export default function JobsPanelK2() {
     <div className="flex flex-col w-full bg-white">
       <div className="flex flex-row justify-between items-center px-[32px] py-[16px]">
         <div className="flex flex-row grow-0 space-x-[8px] text-amber-950">
-          <h1 className="text-3xl font-bold">Jobs</h1>
-          <h1 className="text-3xl font-bold">{"(" + numJobs + ")"}</h1>
+          <h1 className="text-3xl font-bold">{"Jobs (" + numJobs + ")"}</h1>
         </div>
         <div>
           <ButtonK1
