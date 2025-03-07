@@ -136,7 +136,7 @@ export default function JobsPanelK3() {
   }
   let numJobs = mockdata.length;
 
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<jobTable | null>(null);
 
   let data = mockrow;
 
@@ -155,7 +155,7 @@ export default function JobsPanelK3() {
     },
     {
       title: "View Details",
-      render: (_, record) => (
+      render: (_: unknown, record: jobTable) => (
         <Button onClick={() => setSelectedItem(record)}>View Details</Button>
       ),
     },
