@@ -26,7 +26,7 @@ def upload_video():
     video_file.save(video_path)
 
     # Start processing the video frames
-    socketio.start_background_task(target=process_video_frames, video_path=video_path)
+    socketio.start_background_task(target=process_video_frames_deepSort, video_path=video_path)
     
     return jsonify({'status': 'Video uploaded and processing started'}), 200
    
