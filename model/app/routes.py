@@ -9,7 +9,7 @@ import base64
 import cv2
 import numpy as np
 from app import socketio
-from ml.yolo_model import process_video_frames, process_video_frames_deepSort
+from ml.yolo_model import process_video_frames_deepSort
 
 
 main = Blueprint('main', __name__)
