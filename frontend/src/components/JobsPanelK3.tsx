@@ -8,11 +8,13 @@ import { FaPlus } from "react-icons/fa6";
 import { formatThaiDate } from "@/service/formatThaiDate";
 import SingleSubJobK1Q1 from "./SingleSubJobK1Q1";
 import { Table, Button } from "antd";
+import { useRouter } from "next/navigation";
 
 import { MdOutlineFileDownload } from "react-icons/md";
 
 export default function JobsPanelK3() {
   //state 0 = pending, 1 = finished, 2 = fail
+  const router = useRouter();
   const mockdata: jobK2[] = [
     {
       id: 0,
@@ -172,6 +174,9 @@ export default function JobsPanelK3() {
             text="Add Job"
             IconLeft={<FaPlus size={24} />}
             showIconLeft={true}
+            onClick={() => {
+              router.push("/newjob/step1");
+            }}
           />
         </div>
       </div>
