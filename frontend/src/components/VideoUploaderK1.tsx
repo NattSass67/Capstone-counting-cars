@@ -9,6 +9,7 @@ interface TimeRange {
 }
 
 export default function VideoUploader() {
+  const format = "HH:mm";
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [timeRange, setTimeRange] = useState<TimeRange>({
     startTime: "07:00",
@@ -79,6 +80,7 @@ export default function VideoUploader() {
           <span>จาก</span>
           <div className="relative">
             <TimePicker
+              format={format}
               onChange={(value) => handleTimeChange("endTime", value as any)}
             />
           </div>
@@ -86,6 +88,7 @@ export default function VideoUploader() {
           <span>ถึง</span>
           <div className="relative">
             <TimePicker
+              format={format}
               onChange={(value) => handleTimeChange("endTime", value as any)}
             />
           </div>

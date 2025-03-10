@@ -185,14 +185,8 @@ export default function JobsPanelK3() {
         <Table
           dataSource={data}
           columns={columns}
-          className="border border-gray-300"
+          className="border border-gray-300 priority"
           rowClassName={() => "hover:bg-orange-50"}
-          // components={{
-          //   table: (props) => (
-          //     <table {...props} className="w-full border-collapse" />
-          //   ),
-          // }}
-          // scroll={{ y: 500 }}
         />
       </div>
 
