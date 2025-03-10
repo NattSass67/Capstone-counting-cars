@@ -8,6 +8,7 @@ export default function ButtonK1({
   IconRight = null,
   className = "",
   type = "button",
+  onClick = () => {},
 }: {
   showIconLeft?: boolean;
   showIconRight?: boolean;
@@ -16,6 +17,7 @@ export default function ButtonK1({
   IconRight?: React.ReactNode;
   className?: string;
   type?: "button" | "submit" | "reset";
+  onClick?: () => void;
 }) {
   return (
     <ButtonK0
@@ -29,6 +31,7 @@ export default function ButtonK1({
         "border-[3px] border-yellow-950 text-white text-xl font-bold bg-orange-500 rounded-[999px] hover:bg-orange-600 "
       }
       type={type}
+      onClick={onClick}
     />
   );
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { DatePicker } from "antd";
 import type { DatePickerProps } from "antd";
 import { Dayjs } from "dayjs";
+import VideoUploaderK1 from "@/components/VideoUploaderK1";
 
 export default function NewJobStep1() {
   const onChange: DatePickerProps<Dayjs[]>["onChange"] = (date, dateString) => {
@@ -42,6 +43,7 @@ export default function NewJobStep1() {
             onChange={onChange}
             needConfirm
             className="w-full h-[48px] focus:border-orange-500 focus:outline-none"
+            
           />
         </div>
         <div className="flex flex-row space-x-[8px] items-center">
@@ -58,6 +60,7 @@ export default function NewJobStep1() {
             placeholder="ทิศทาง"
           />
         </div>
+        <VideoUploaderK1 />
       </form>
       <div></div>
     </div>
