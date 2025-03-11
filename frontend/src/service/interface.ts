@@ -19,6 +19,7 @@ export interface jobK2 extends job {
 }
 
 export interface jobTable {
+  direction: string;
   id: number;
   name: string;
   intersectionName: string;

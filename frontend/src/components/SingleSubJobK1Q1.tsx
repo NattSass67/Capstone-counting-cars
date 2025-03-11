@@ -19,7 +19,7 @@ export default function SingleSubJobK1Q1({
 }) {
   let statustext = "";
   let buttontext = "";
-  let statusTextColor = "text-yellow-500";
+  let statusTextColor = "text-yellow-500 text-lg";
   let icon = <Icon>{null}</Icon>;
   let buttonIcon = <IoMdSearch />;
   if (status == 0) {
@@ -27,19 +27,19 @@ export default function SingleSubJobK1Q1({
     buttontext = "ยกเลิก";
     icon = <CircularProgress sx={{ color: "#92400e" }} />;
     buttonIcon = <MdOutlineCancel />;
-    statusTextColor = "text-yellow-500 text-xl";
+    statusTextColor = "text-yellow-500 text-lg";
   } else if (status == 1) {
     statustext = "ประมวลผลเสร็จเเล้ว";
     buttontext = "ดูผลลัพธ์";
     icon = <CheckMarkIcon />;
     buttonIcon = <IoMdSearch />;
-    statusTextColor = "text-green-500 text-xl";
+    statusTextColor = "text-green-500 text-lg";
   } else if (status == 2) {
     statustext = "ประมวลผลไม่สำเร็จ";
     buttontext = "ลองใหม่";
     icon = <CrossIcon />;
     buttonIcon = <TbReload />;
-    statusTextColor = "text-red-500 text-xl";
+    statusTextColor = "text-red-500 text-lg";
   }
   return (
     <div className="flex flex-row space-x-[48px] bg-white border-[2.5px] border-yellow-950 rounded-[32px] ">
@@ -52,7 +52,7 @@ export default function SingleSubJobK1Q1({
           className="overflow-hidden"
         />
         <div className="flex flex-col space-y-[24px] px-[24px] py-[16px] rounded-[24px] border-[2.5px] border-yellow-950  items-center flex-grow">
-          <div className=" font-bold text-xl flex-none text-amber-900 flex flex-row space-x-[8px]">
+          <div className=" font-bold text-lg flex-none text-amber-900 flex flex-row space-x-[8px]">
             <h1>Status:</h1> <h1 className={statusTextColor}>{statustext}</h1>
           </div>
 

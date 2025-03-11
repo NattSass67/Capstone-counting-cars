@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="bg-white">
       {/* <AppHeader /> */}
-      <Banner />
+      {/* <Banner /> */}
       <div className="flex flex-col space-y-[64px] px-[64px] py-[64px]">
         <FeatureSection />
         <div className="flex flex-col space-y-[32px]">
