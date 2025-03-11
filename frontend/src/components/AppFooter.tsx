@@ -1,4 +1,11 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
 export default function AppFooter() {
+  const pathname = usePathname();
+  const show = !pathname.includes("newjob");
+  if (!show) return null;
   return (
     <div className="w-full h-[216px] flex flex-row bg-orange-950 px-[56px] py-[32px] space-x-[32px]">
       <div className="flex flex-col space-y-[8px]">

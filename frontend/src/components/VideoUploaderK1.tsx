@@ -1,16 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useRef, useState } from "react";
 import { TimePicker } from "antd";
+import { useEffect } from "react";
 
-interface TimeRange {
+export interface VideoData {
+  video: File | null;
   startTime: string;
   endTime: string;
 }
 
-export default function VideoUploader() {
+export default function VideoUploader(props: {
+  onChange: (data: any) => void;
+}) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [timeRange, setTimeRange] = useState<TimeRange>({
+
+  const [data, setData] = useState<VideoData>({
+    video: null,
     startTime: "07:00",
     endTime: "07:00",
   });
@@ -20,30 +29,27 @@ export default function VideoUploader() {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      setData({
+        ...data,
+        video: file,
+      });
     }
   };
 
   const handleTimeChange = (type: "startTime" | "endTime", value: string) => {
-    setTimeRange((prev) => ({
-      ...prev,
+    setData({
+      ...data,
       [type]: value,
-    }));
+    });
   };
 
-  const handleNowClick = (type: "startTime" | "endTime") => {
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(
-      now.getMinutes()
-    ).padStart(2, "0")}`;
-    handleTimeChange(type, currentTime);
-  };
-
-  const handleClear = (type: "startTime" | "endTime") => {
-    handleTimeChange(type, "07:00");
-  };
+  useEffect(() => {
+    console.log(data);
+    props.onChange && props.onChange(data);
+  }, [data]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto p-4">
+    <div className="w-full max-w-3xl mx-auto p-4 border-t border-gray-300 pt-10">
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
         <h2 className="text-xl mb-2">Upload a Video Here</h2>
         <p className="text-gray-500 mb-4">
@@ -70,23 +76,31 @@ export default function VideoUploader() {
       </div>
 
       <div className="mt-6">
-        <h3 className="text-lg mb-2">ข้อมูลของ video</h3>
+        <h3 className="text-xl mb-2">ข้อมูลของ video</h3>
         <p className="text-gray-600 mb-4">
           ช่วงเวลาของวิดีโอ (เช่น 07:00 - 07:15):
         </p>
 
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-4 text-lg">
           <span>จาก</span>
           <div className="relative">
             <TimePicker
-              onChange={(value) => handleTimeChange("endTime", value as any)}
+              onChange={(value, dateString) =>
+                handleTimeChange("startTime", dateString as any)
+              }
+              className="text-lg h-[48px]"
+              format="HH:mm"
             />
           </div>
 
           <span>ถึง</span>
           <div className="relative">
             <TimePicker
-              onChange={(value) => handleTimeChange("endTime", value as any)}
+              onChange={(value, dateString) =>
+                handleTimeChange("endTime", dateString as any)
+              }
+              className="text-lg h-[48px]"
+              format="HH:mm"
             />
           </div>
         </div>
