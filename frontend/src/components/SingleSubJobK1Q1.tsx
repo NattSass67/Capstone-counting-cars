@@ -51,7 +51,7 @@ export default function SingleSubJobK1Q1({
           width={160}
           className="overflow-hidden"
         />
-        <div className="flex flex-col space-y-[24px] px-[24px] py-[16px] rounded-[24px] border-[2.5px] border-yellow-950 justify-center flex-grow bg-red-100">
+        <div className="flex flex-col space-y-[24px] px-[24px] py-[16px] rounded-[24px] border-[2.5px] border-yellow-950 justify-center flex-grow">
           <div className=" font-bold text-lg text-amber-900 flex flex-row space-x-[8px] text-nowrap items-center">
             <h1 className="">Status:</h1>
             <h1 className={statusTextColor + ""}>{statustext}</h1>
