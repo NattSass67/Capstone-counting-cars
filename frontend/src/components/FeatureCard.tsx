@@ -13,7 +13,7 @@ export default function FeatureCard({
   featureUrl: string;
 }) {
   return (
-    <div className="w-[384px] h-[452px] flex flex-col items-center px-[32px] py-[32px] space-y-[32px] rounded-[24px] border-[2.5px] border-orange-950 bg-white size-fit  ">
+    <div className="w-[384px] h-[452px] flex flex-col items-center px-[32px] py-[32px] space-y-[32px] rounded-[24px] border-[2.5px] border-orange-950 bg-white size-fit shadow-2xl ">
       <Image
         src={imageUrl}
         alt={title + "'s image"}
