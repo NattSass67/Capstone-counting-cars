@@ -16,7 +16,8 @@ import useJobsProcessingDataStore from "@/stores/processsing-jobs/processing-job
 
 export default function JobsPanelK3() {
   //state 0 = pending, 1 = finished, 2 = fail
-  const { data: jobsProcessingData, setJobsProcessingData } = useJobsProcessingDataStore();
+  const { data: jobsProcessingData, setJobsProcessingData } =
+    useJobsProcessingDataStore();
   const router = useRouter();
   const mockdata: jobK2[] = [
     {
@@ -143,16 +144,16 @@ export default function JobsPanelK3() {
 
   const [selectedItem, setSelectedItem] = useState<jobTable | null>(null);
 
-  const data = jobsProcessingData.map((item,index) => {
+  const data = jobsProcessingData.map((item, index) => {
     return {
       id: index,
       name: "งาน " + index,
-      intersectionName: item.intersectionName as string,  
-      date: item.date as string ,
+      intersectionName: item.intersectionName as string,
+      date: item.date as string,
       direction: item.direction as string,
       countingState: "Processing...",
     };
-  } );
+  });
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -170,9 +171,17 @@ export default function JobsPanelK3() {
     {
       title: "Action",
       render: (_: unknown, record: jobTable) => (
-        <div className="flex flex-row space-x-[8px]">
+        <div className="flex flex-row space-x-[24px]">
           <Button onClick={() => setSelectedItem(record)}>View Details</Button>
-          <Button onClick={() => setJobsProcessingData(jobsProcessingData.filter((item, index) => index !== record.id))}>Delete</Button>
+          <Button
+            onClick={() =>
+              setJobsProcessingData(
+                jobsProcessingData.filter((item, index) => index !== record.id)
+              )
+            }
+          >
+            Delete
+          </Button>
         </div>
       ),
     },
@@ -182,7 +191,9 @@ export default function JobsPanelK3() {
     <div className="flex flex-col w-full bg-white">
       <div className="flex flex-row justify-between items-center px-[32px] py-[16px]">
         <div className="flex flex-row grow-0 space-x-[8px] text-amber-950">
-          <h1 className="text-3xl font-bold">{"Jobs (" + jobsProcessingData.length + ")"}</h1>
+          <h1 className="text-3xl font-bold">
+            {"Jobs (" + jobsProcessingData.length + ")"}
+          </h1>
         </div>
         <div>
           <ButtonK1
@@ -201,7 +212,7 @@ export default function JobsPanelK3() {
           dataSource={data}
           columns={columns}
           className="border border-gray-300 priority"
-          rowClassName={() => "hover:bg-orange-50"}
+          rowClassName={() => "hover:bg-orange-50 bg-yellow-100"}
         />
       </div>
 
@@ -230,9 +241,7 @@ export default function JobsPanelK3() {
                     </tr>
                     <tr>
                       <th className="w-1/5 text-left font-bold">ทิศทาง:</th>
-                      <td className="font-normal">
-                        {selectedItem.direction}
-                      </td>
+                      <td className="font-normal">{selectedItem.direction}</td>
                     </tr>
                   </tbody>
                 </table>
