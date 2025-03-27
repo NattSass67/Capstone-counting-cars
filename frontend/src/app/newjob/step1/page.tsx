@@ -19,6 +19,8 @@ export default function NewJobStep1() {
   // };
   const router = useRouter();
 
+  const [videoUploaders, setVideoUploaders] = useState<number>(4);
+
   const { jobsData, setJobsData, resetJobsData } = useJobsDataStore();
   const onFormChange = (
     data: any,
@@ -97,7 +99,7 @@ export default function NewJobStep1() {
               placeholder="ทิศทาง"
             />
           </div>
-          <div className="flex flex-col gap-8 my-8">
+          {/* <div className="flex flex-col gap-8 my-8">
             <VideoUploaderK1
               onChange={(data) => onFormChange(data, "video", "array", 0)}
             />
@@ -110,17 +112,34 @@ export default function NewJobStep1() {
             <VideoUploaderK1
               onChange={(data) => onFormChange(data, "video", "array", 3)}
             />
+          </div> */}
+          <div className="flex flex-col gap-8 my-8">
+            {Array.from({ length: videoUploaders }).map((_, index) => (
+              <VideoUploaderK1
+                key={index}
+                onChange={(data) => onFormChange(data, "video", "array", index)}
+              />
+            ))}
           </div>
         </div>
       </form>
-      <div className="flex justify-center pb-16">
-        <ButtonK1
-          text="Confirm"
-          showIconLeft={true}
-          onClick={() => {
-            router.push("/newjob/step2");
-          }}
-        />
+      <div className="flex justify-center flex-col space-y-[8px] ">
+        <div className="flex-grow-0 justify-center items-center flex">
+          <ButtonK1
+            text="Add more video"
+            showIconLeft={false}
+            onClick={() => setVideoUploaders((prev) => prev + 1)}
+          />
+        </div>
+        <div className="flex-grow-0 justify-center items-center flex">
+          <ButtonK1
+            text="Confirm"
+            showIconLeft={false}
+            onClick={() => {
+              router.push("/newjob/step2");
+            }}
+          />
+        </div>
       </div>
     </div>
   );
