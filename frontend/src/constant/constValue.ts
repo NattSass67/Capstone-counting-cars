@@ -10,3 +10,13 @@ export const StraightLineFeature =
 
 export const IntersectionsFeature =
   "This feature will only count the vehicle in the intersections such as T interssection, X intersection, Y intersection, etc.";
+
+// ==============================================================
+//                           Button Classes
+// ==============================================================
+
+export const ButtonK1Class =
+  "border-[2.5px] border-yellow-950 text-white text-base font-bold bg-orange-500 hover:bg-orange-600";
+
+export const ButtonK2Class =
+  "border-[2.5px] border-yellow-950 text-white text-base font-bold bg-orange-500 hover:bg-orange-600";
