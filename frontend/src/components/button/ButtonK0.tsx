@@ -8,7 +8,7 @@ export default function ButtonK0({
   IconRight = null,
   className = "",
   type = "button",
-  onClick = () => {},
+  onClick = (...args: any[]) => {},
 }: {
   showIconLeft?: boolean;
   showIconRight?: boolean;
@@ -24,7 +24,7 @@ export default function ButtonK0({
       onClick={onClick}
       className={
         className +
-        "rounded-[999px] px-[16px] py-[8px] flex flex-row justify-center items-center space-x-[24px]"
+        " px-[16px] py-[8px] flex flex-row justify-center items-center space-x-[24px]"
       }
       type={type}
     >

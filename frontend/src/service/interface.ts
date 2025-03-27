@@ -26,3 +26,9 @@ export interface jobTable {
   date: string;
   countingState: string;
 }
+
+export interface VideoData {
+  video: File | null;
+  startTime: string;
+  endTime: string;
+}

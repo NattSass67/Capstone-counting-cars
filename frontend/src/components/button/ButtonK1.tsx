@@ -8,7 +8,8 @@ export default function ButtonK1({
   IconRight = null,
   className = "",
   type = "button",
-  onClick = () => {},
+  onClick = (...args: any[]) => {},
+  roundedNumber = 999,
 }: {
   showIconLeft?: boolean;
   showIconRight?: boolean;
@@ -18,6 +19,7 @@ export default function ButtonK1({
   className?: string;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
+  roundedNumber?: number;
 }) {
   return (
     <ButtonK0
@@ -28,7 +30,8 @@ export default function ButtonK1({
       IconRight={IconRight}
       className={
         className +
-        "border-[2.5px] border-yellow-950 text-white text-base font-bold bg-orange-500 rounded-[999px] hover:bg-orange-600 "
+        "border-[2.5px] border-yellow-950 text-white text-base font-bold bg-orange-500 hover:bg-orange-600 " +
+        `rounded-[${roundedNumber}px]`
       }
       type={type}
       onClick={onClick}

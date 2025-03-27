@@ -6,15 +6,19 @@
 import React, { useRef, useState } from "react";
 import { TimePicker } from "antd";
 import { useEffect } from "react";
+import { VideoData } from "@/service/interface";
+import ButtonK1 from "./button/ButtonK1";
 
-export interface VideoData {
-  video: File | null;
-  startTime: string;
-  endTime: string;
-}
-
-export default function VideoUploader(props: {
+export default function VideoUploaderK1({
+  onChange,
+  index,
+  onDelete,
+  totalVideo,
+}: {
   onChange: (data: any) => void;
+  index: number;
+  onDelete: Function;
+  totalVideo: number;
 }) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -45,25 +49,36 @@ export default function VideoUploader(props: {
 
   useEffect(() => {
     console.log(data);
-    props.onChange && props.onChange(data);
+    // props.onChange && props.onChange(data);
+    onChange && onChange(data);
   }, [data]);
+
+  let showDeleteButton = index == totalVideo - 1;
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 border-t border-amber-950 pt-10">
+      <div className="pb-4 flex flex-row justify-between items-center">
+        <h1 className="text-xl font-bold text-amber-950">
+          คลิปที่ {index + 1}
+        </h1>
+        {showDeleteButton && (
+          <ButtonK1 text="remove this video" onClick={() => onDelete(index)} />
+        )}
+      </div>
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
-        <h2 className="text-xl mb-2">Upload a Video Here</h2>
+        <h2 className="text-xl mb-2">Upload Video จากเครื่อง</h2>
         <p className="text-gray-500 mb-4">
-          Upload Video ความยาวไม่เกิน 15 นาที
+          Upload Video ความยาวไม่เกิน 1 ชั่วโมง
         </p>
 
         {!selectedFile && (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600"
-          >
-            เลือก Video
-          </button>
+          <div className="flex flex-col items-center justify-center">
+            <ButtonK1
+              roundedNumber={8}
+              text="เลือก Video"
+              onClick={() => fileInputRef.current?.click()}
+            />
+          </div>
         )}
 
         <input
