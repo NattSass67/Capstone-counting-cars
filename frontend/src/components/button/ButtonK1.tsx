@@ -28,7 +28,7 @@ export default function ButtonK1({
       IconRight={IconRight}
       className={
         className +
-        "border-[3px] border-yellow-950 text-white text-lg font-bold bg-orange-500 rounded-[999px] hover:bg-orange-600 "
+        "border-[2.5px] border-yellow-950 text-white text-base font-bold bg-orange-500 rounded-[999px] hover:bg-orange-600 "
       }
       type={type}
       onClick={onClick}

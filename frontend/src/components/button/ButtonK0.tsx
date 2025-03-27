@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 export default function ButtonK0({
   showIconLeft = false,
@@ -24,7 +24,7 @@ export default function ButtonK0({
       onClick={onClick}
       className={
         className +
-        "rounded-[999px] px-[24px] py-[16px] flex flex-row justify-center items-center space-x-[24px]"
+        "rounded-[999px] px-[16px] py-[8px] flex flex-row justify-center items-center space-x-[24px]"
       }
       type={type}
     >
