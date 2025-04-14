@@ -59,22 +59,19 @@ const VideoUploader = () => {
             ctx.fillText(detection.label, x1, y1 - 5);
           });
 
-          // Draw the crossing line in blue
-          ctx.strokeStyle = "blue";
+          // Draw all crossing lines
+          const colors = ["red", "lightgreen", "blue", "orange"];
+
           ctx.lineWidth = 2;
-          ctx.beginPath();
+          (data.lines as [number, number][][]).forEach(([start, end], index) => {
+              ctx.strokeStyle = colors[index % colors.length];
+              ctx.beginPath();
+              ctx.moveTo(start[0], start[1]); 
+              ctx.lineTo(end[0], end[1]);     
+              ctx.stroke();
+          });
 
-          if (data.line_orientation === "horizontal") {
-            // Draw a horizontal line across the canvas at the specified y-coordinate
-            ctx.moveTo(0, data.line_position);
-            ctx.lineTo(canvas.width, data.line_position);
-          } else {
-            // Draw a vertical line down the canvas at the specified x-coordinate
-            ctx.moveTo(data.line_position, 0);
-            ctx.lineTo(data.line_position, canvas.height);
-          }
 
-          ctx.stroke();
         };
       }
     });
@@ -145,11 +142,13 @@ const VideoUploader = () => {
 
       {processing && <div className="text-gray-800 mt-8">Processing video...</div>}
       <div className="text-gray-800 mt-8">
-        <h2 className="font-semibold">In Counts</h2>
+        {/* <h2 className="font-semibold">In Counts</h2>
         <pre>{JSON.stringify(result.label_counts_in, null, 2)}</pre>
 
         <h2 className="font-semibold mt-4">Out Counts</h2>
-        <pre>{JSON.stringify(result.label_counts_out, null, 2)}</pre>
+        <pre>{JSON.stringify(result.label_counts_out, null, 2)}</pre> */}
+        <h2 className="font-semibold mt-4">Result last video</h2>
+        <pre>{JSON.stringify(result.Result, null, 2)}</pre>
       </div>
     </div>
   );

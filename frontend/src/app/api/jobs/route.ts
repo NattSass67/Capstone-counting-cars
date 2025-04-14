@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { IncomingForm } from "formidable";
+// import { IncomingForm } from "formidable";
 import { mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
 import axios from "axios";
@@ -52,17 +52,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const simplifiedLines = lines.map((line: { start: any; end: any; }) => [line.start, line.end]);
     //then post http://localhost:5000/detect by sending the video file and lines
     const forwardFormData = new FormData();
     // ✅ this works fine — File is a valid object
-    forwardFormData.append("file", files[0]);
+    files.forEach(file => {
+      forwardFormData.append("videos", file);
+    });
+    
 
-    if (lines) forwardFormData.append("lines", lines);
-    // const res = await axios.post("http://localhost:5000/detect", forwardFormData, {
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // });
+    if (simplifiedLines) forwardFormData.append("lines", JSON.stringify(simplifiedLines));
+    try {
+      const res = await axios.post("http://localhost:5000/detect", forwardFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Video uploaded successfully :v", res.data);
+    } catch (error) {
+      console.error("Error uploading video :v", error);
+    }
 
     //then look into your debugger
     

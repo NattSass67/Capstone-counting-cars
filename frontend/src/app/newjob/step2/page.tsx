@@ -63,7 +63,7 @@ export default function NewJobStep2() {
       });
   
       console.log("Upload success:", response.data);
-      //router.push("/newjob/step3");
+      router.push("/test-uploader");
     } catch (err) {
       console.error("Upload failed:", err);
       alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
