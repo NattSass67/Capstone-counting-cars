@@ -13,17 +13,6 @@ export const config = {
 };
 
 // Utility: Parse FormData using formidable
-const parseForm = (req: Request): Promise<{ fields: any; files: any }> => {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({ multiples: true, keepExtensions: true });
-    form.parse(req as any, (err, fields, files) => {
-      if (err) {
-        reject(err);
-      }
-      resolve({ fields, files });
-    });
-  });
-};
 
 export async function POST(req: NextRequest) {
   try {
