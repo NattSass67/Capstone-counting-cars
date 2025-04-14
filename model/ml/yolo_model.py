@@ -10,8 +10,8 @@ import numpy as np
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 
-model_name = 'yolov10n.pt'
-model = YOLO(model_name) 
+model_name = 'yolo11s.pt'
+model = YOLO(model_name).to("cuda")
 
 def line_constants(line_starts, line_finishes):
     a = line_finishes[:,1]-line_starts[:,1]
@@ -22,7 +22,7 @@ def line_constants(line_starts, line_finishes):
     
 
 def cross_line(pos1,pos2, line_start, line_finish):
-    box = min(line_start[0],line_finish[0])-50, max(line_start[0],line_finish[0])+50, min(line_start[1],line_finish[1])-50, max(line_start[1],line_finish[1])+50
+    box = min(line_start[0],line_finish[0])-40, max(line_start[0],line_finish[0])+40, min(line_start[1],line_finish[1])-40, max(line_start[1],line_finish[1])+40
     within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
     #Within the box.
     #The line is ax1 + by1 = c, ax2+by2 = c
@@ -31,6 +31,7 @@ def cross_line(pos1,pos2, line_start, line_finish):
     # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
     #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
     if not within_box: return 0,0
+    
     a = line_finish[1]-line_start[1]
     b = line_start[0]-line_finish[0]
     
@@ -60,7 +61,24 @@ def cross_line_numpy(pos1,pos2, abc):
     return np.logical_and(np.logical_not(first_line_geq), second_line_geq),  np.logical_and(first_line_geq, np.logical_not(second_line_geq))
 
 
-def process_video_frames_deepSort(video_path, line_position=350, line_orientation='horizontal'):
+def get_result(lines_crossed):
+    DICT = {}
+    for i in lines_crossed.values():
+        if not isinstance(i, list) or len(i) < 2:
+            continue  # Skip empty or invalid items
+
+        label = i[0]
+        key = tuple(i[1:])
+        if key not in DICT:
+            DICT[key] = {}
+        if label not in DICT[key]:
+            DICT[key][label] = 0
+        DICT[key][label] += 1
+    return DICT
+
+    
+# lines = [((x1, y1), (x2, y2)),...]
+def process_video_frames_deepSort(video_path, lines):
     print("process_video_deepsort_called")
     original_width = 1280  # Original video width
     original_height = 720  # Original video height
@@ -68,36 +86,37 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
 
     cap = cv2.VideoCapture(video_path)
     frame_count = 0
-    frame_skip = 3  # Process every 3rd frame
+    frame_skip = 2  # Process every 3rd frame
 
     # Initialize tracking variables
+    Result = []
     label_counts_in = {}  # label -> in count
     label_counts_out = {}  # label -> out count
     previous_centroids = {}  # track_id -> previous centroid
-
+    lines_crossed = {}
     # Initialize DeepSort
-    tracker = DeepSort(max_age=30)
+    tracker = DeepSort(max_age=30,bgr=False)
     
-    line_starts = np.linspace(200, 500,100)
-    line_stops = np.linspace(200, 500,100)
-    line_starts,line_stops = np.meshgrid(line_starts,line_stops)
-    line_starts = line_starts.reshape(-1)
-    line_stops = line_stops.reshape(-1)
-    line_grid_SHAPE = line_starts.shape[0]
-    print(line_starts.shape)
-    print(line_stops.shape)
-    if line_orientation == "horizontal":
-        line_starts = np.stack((np.full(line_starts.shape,0),line_starts),axis=1)
-        line_stops = np.stack((np.full(line_stops.shape,original_width),line_stops),axis=1)
-    else:
-        line_starts = np.stack((line_starts,np.full(line_starts.shape,0)),axis=1)
-        line_stops = np.stack((line_starts,np.full(line_stops.shape,original_height)),axis=1)
-    abcs = line_constants(line_starts, line_stops)
-    out_crossings, in_crossings = np.zeros(line_grid_SHAPE),np.zeros(line_grid_SHAPE)
-    out_crossed = {}
-    in_crossed = {}
-    in_crossing_labelled = {}
-    out_crossing_labelled = {}
+    #line_starts = np.linspace(200, 500,100)
+    #line_stops = np.linspace(200, 500,100)
+    #line_starts,line_stops = np.meshgrid(line_starts,line_stops)
+    #line_starts = line_starts.reshape(-1)
+    #line_stops = line_stops.reshape(-1)
+    #line_grid_SHAPE = line_starts.shape[0]
+    #print(line_starts.shape)
+    #print(line_stops.shape)
+    #if line_orientation == "horizontal":
+    #    line_starts = np.stack((np.full(line_starts.shape,0),line_starts),axis=1)
+    #    line_stops = np.stack((np.full(line_stops.shape,original_width),line_stops),axis=1)
+    #else:
+    #    line_starts = np.stack((line_starts,np.full(line_starts.shape,0)),axis=1)
+    #    line_stops = np.stack((line_starts,np.full(line_stops.shape,original_height)),axis=1)
+    #abcs = line_constants(line_starts, line_stops)
+    #out_crossings, in_crossings = np.zeros(line_grid_SHAPE),np.zeros(line_grid_SHAPE)
+    #out_crossed = {}
+    #in_crossed = {}
+    #in_crossing_labelled = {}
+    #out_crossing_labelled = {}
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -164,64 +183,59 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
             
             
             if track_id in previous_centroids:
-                
-                prev_centroid = previous_centroids[track_id]
-                new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
-                
-                if label not in in_crossing_labelled:
-                    in_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
-                if label not in out_crossing_labelled:
-                    out_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
-                
-                if track_id not in out_crossed:
-                    out_crossed[track_id] = np.zeros(line_grid_SHAPE)
-                if track_id not in in_crossed:
-                    in_crossed[track_id] = np.zeros(line_grid_SHAPE)
-                
-                out_crossings += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
-                out_crossing_labelled[label] += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
-                out_crossed[track_id] = np.logical_or(out_crossed[track_id],new_out_crosses)
-                in_crossings += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
-                in_crossing_labelled[label] += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
-                in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
-                #in_crossings += new_in_crosses
-                
-                
-                if line_orientation == 'horizontal':
-                    line_start = (0, line_position)
-                    line_finish = (frame.shape[1], line_position)
-                else:
-                    line_start = (line_position, 0)
-                    line_finish = (line_position, frame.shape[0])
+                if track_id not in lines_crossed:
+                    lines_crossed[track_id] = []
+                for line_id, (line_start, line_finish) in enumerate(lines):
+                    prev_centroid = previous_centroids[track_id]
+                    #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
+                    
+                    #if label not in in_crossing_labelled:
+                    #    in_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    #if label not in out_crossing_labelled:
+                    #    out_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    
+                    #if track_id not in out_crossed:
+                    #    out_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    #if track_id not in in_crossed:
+                    #    in_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    
+                    #out_crossings += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossing_labelled[label] += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossed[track_id] = np.logical_or(out_crossed[track_id],new_out_crosses)
+                    #in_crossings += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossing_labelled[label] += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
+                    #in_crossings += new_in_crosses
+                    
+                    line_start, line_finish = lines[line_id]
 
-                First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
+    
+                    First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
 
-                if First != Second:
-                    if First == 1:  # "In" crossing
-                        if label not in label_counts_in:
-                            label_counts_in[label] = 0
-                        label_counts_in[label] += 1
-                    elif First == 0:  # "Out" crossing
-                        if label not in label_counts_out:
-                            label_counts_out[label] = 0
-                        label_counts_out[label] += 1
+                    if First != Second:
+                        if First == 1:  # "In" crossing
+                            lines_crossed[track_id].append(("in",line_id))
+                        elif First == 0:  # "Out" crossing
+                            lines_crossed[track_id].append(("out",line_id))
                 
 
             # Update previous centroid
             previous_centroids[track_id] = centroid
             
         
-        
-        print("Out and in crossings")
-        print({i:j[out_crossings.argmax()] for i,j in out_crossing_labelled.items()})
-        print({i:j[in_crossings.argmax()] for i,j in in_crossing_labelled.items()})
+        #print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
+        #print("Out and in crossings")
+        #out_line_loc = out_crossings.argsort()[-1000]
+        #in_line_loc = in_crossings.argsort()[-1000]
+        #print({i:j[out_line_loc] for i,j in out_crossing_labelled.items()})
+        #print({i:j[in_line_loc] for i,j in in_crossing_labelled.items()})
         
         #print(out_crossings.max())
         #print(in_crossings.max())
         #print(out_crossings.argmax())
         #print(in_crossings.argmax())
-        print(line_starts[out_crossings.argmax()])
-        print(line_stops[out_crossings.argmax()])
+        #print(line_starts[out_crossings.argmax()])
+        #print(line_stops[out_crossings.argmax()])
         
         # Print updated label counts
         print(f"Current crossing counts: {label_counts_in}")
@@ -234,17 +248,16 @@ def process_video_frames_deepSort(video_path, line_position=350, line_orientatio
         socketio.emit('frame-processed', {
             'frame': frame_base64,
             'detections': detections_to_send,
-            'label_counts_in': label_counts_in,
-            'label_counts_out': label_counts_out,
-            'line_orientation': line_orientation,
-            'line_position': line_position
+            'lines': lines,
+            'Result': Result
         })
 
         eventlet.sleep(0.001)
-
+    
+    Result = get_result(lines_crossed)
+    print("Result",Result)
     cap.release()
     print("Video processing completed.")
 
     
 #Using track.mean could allow one to ascertain the velocity, but let's do the velocity from just positions alone.
-
