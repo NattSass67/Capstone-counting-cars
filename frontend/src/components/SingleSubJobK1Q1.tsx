@@ -1,0 +1,73 @@
+import Image from "next/image";
+import Icon from "./Icon/Icon";
+import CheckMarkIcon from "./Icon/CheckMarkIcon";
+import CrossIcon from "./Icon/CrossIcon";
+import CircularProgress from "@mui/material/CircularProgress";
+import ButtonK1 from "./button/ButtonK1";
+import { IoMdSearch } from "react-icons/io";
+import { MdOutlineCancel } from "react-icons/md";
+import { TbReload } from "react-icons/tb";
+
+export default function SingleSubJobK1Q1({
+  status,
+  resultUrl = "",
+  imageUrl = "/img/traffic.jpg",
+}: {
+  status: number;
+  resultUrl?: string;
+  imageUrl?: string;
+}) {
+  let statustext = "";
+  let buttontext = "";
+  let statusTextColor = "text-yellow-500 text-lg";
+  let icon = <Icon>{null}</Icon>;
+  let buttonIcon = <IoMdSearch />;
+  if (status == 0) {
+    statustext = "กำลังประมวลผล...";
+    buttontext = "ยกเลิก";
+    icon = <CircularProgress sx={{ color: "#92400e" }} />;
+    buttonIcon = <MdOutlineCancel />;
+    statusTextColor = "text-yellow-500 text-lg";
+  } else if (status == 1) {
+    statustext = "ประมวลผลเสร็จเเล้ว";
+    buttontext = "ดูผลลัพธ์";
+    icon = <CheckMarkIcon />;
+    buttonIcon = <IoMdSearch />;
+    statusTextColor = "text-green-500 text-lg";
+  } else if (status == 2) {
+    statustext = "ประมวลผลไม่สำเร็จ";
+    buttontext = "ลองใหม่";
+    icon = <CrossIcon />;
+    buttonIcon = <TbReload />;
+    statusTextColor = "text-red-500 text-lg";
+  }
+  return (
+    <div className="flex flex-row flex-1 bg-white border-[2.5px] border-yellow-950 rounded-[32px] ">
+      <div className="flex flex-row px-[24px] py-[24px] space-x-[48px] flex-grow ">
+        <Image
+          src={imageUrl}
+          alt="picture"
+          height={90}
+          width={160}
+          className="overflow-hidden"
+        />
+        <div className="flex flex-col space-y-[24px] px-[24px] py-[16px] rounded-[24px] border-[2.5px] border-yellow-950 justify-center flex-grow">
+          <div className=" font-bold text-lg text-amber-900 flex flex-row space-x-[8px] text-nowrap items-center">
+            <h1 className="">Status:</h1>
+            <h1 className={statusTextColor + ""}>{statustext}</h1>
+          </div>
+
+          {/* {icon} */}
+        </div>
+      </div>
+      <div className="w-[232px] flex flex-col justify-end px-[24px] py-[24px]">
+        <ButtonK1
+          IconLeft={buttonIcon}
+          showIconLeft={true}
+          text={buttontext}
+          type="button"
+        />
+      </div>
+    </div>
+  );
+}
