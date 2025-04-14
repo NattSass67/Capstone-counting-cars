@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { VideoData } from "@/service/interface";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { VideoData } from "@/components/VideoUploaderK1";
+
 // Define the user profile interface
+
 export interface JobsData {
   intersectionName?: string;
   date?: string;
@@ -16,44 +17,74 @@ interface JobsDataState {
   jobsData: JobsData | null;
   setJobsData: (data: JobsData) => void;
   resetJobsData: () => void;
+  addJobsData: () => void;
+  removeJobData: () => void;
 }
 
 // Create the store
-const useJobsDataStore = create(
-  persist<JobsDataState>(
-    (set) => ({
+const useJobsDataStore = create<JobsDataState>((set, get) => ({
+  jobsData: {
+    intersectionName: "",
+    date: "",
+    direction: "",
+    video: [
+      {
+        video: null,
+        startTime: "",
+        endTime: "",
+      },
+    ],
+  },
+
+  setJobsData: (data: JobsData) => {
+    console.log("Setdata store", data);
+    set({ jobsData: data });
+  },
+
+  addJobsData: () => {
+    const current = get().jobsData;
+    if (!current) return;
+    const newVideoData = {
+      video: null,
+      startTime: "",
+      endTime: "",
+    };
+    set({
+      jobsData: {
+        ...current,
+        video: [...(current.video || []), newVideoData],
+      },
+    });
+  },
+
+  removeJobData: () => {
+    const current = get().jobsData;
+    if (!current || !current.video?.length) return;
+    const updatedVideoList = current.video.slice(0, -1);
+    set({
+      jobsData: {
+        ...current,
+        video: updatedVideoList,
+      },
+    });
+  },
+
+  resetJobsData: () =>
+    set({
       jobsData: {
         intersectionName: "",
         date: "",
         direction: "",
-        video: Array.from({ length: 4 }, () => ({
-          video: null,
-          startTime: "",
-          endTime: "",
-        })),
-      }, // Initialize as null or default state
-      setJobsData: (data: JobsData) => set({ jobsData: data }),
-      resetJobsData: () =>
-        set({
-          jobsData: {
-            intersectionName: "",
-            date: "",
-            direction: "",
-            video: Array.from({ length: 4 }, () => ({
-              video: null,
-              startTime: "",
-              endTime: "",
-            })),
+        video: [
+          {
+            video: null,
+            startTime: "",
+            endTime: "",
           },
-        }),
+        ],
+      },
     }),
-    {
-      name: "job-data-storage", // Name of the item in storage
-      storage: createJSONStorage(() => localStorage), // Using localStorage
-      version: 1,
-    }
-  )
-);
+}));
 
 export default useJobsDataStore;
 
