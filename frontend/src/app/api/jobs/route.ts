@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { IncomingForm } from "formidable";
 import { mkdir, writeFile, readFile } from "fs/promises";
 import path from "path";
+import axios from "axios";
 
 // 👇 Disable Next.js's built-in body parser for this route
 export const config = {
@@ -27,43 +28,62 @@ const parseForm = (req: Request): Promise<{ fields: any; files: any }> => {
 export async function POST(req: NextRequest) {
   try {
     // 1. Parse the form data
-    const { fields, files } = await parseForm(req);
+    const formData = await req.formData();
+    console.log(formData);
 
-    // Convert the fields (which are sent as strings) to JSON
-    const lines = JSON.parse(fields.lines);
-    const jobsData = JSON.parse(fields.jobsData);
+    // Get the file from the form data
+    const files = formData.getAll("videos");
+    console.log(files);
+    if (!files.length || !files[0]) {
+      return NextResponse.json(
+        { error: "No files received." },
+        { status: 400 }
+      );
+    }
 
-    console.log("✅ lines:", lines);
-    console.log("✅ jobsData:", jobsData);
-    console.log("✅ uploaded videos:", files.videos);
+    const lines = JSON.parse(formData.get("lines") as string);
+    const jobsData = JSON.parse(formData.get("jobsData") as string);
+    console.log(lines);
+    console.log(jobsData);
 
-    // 2. Save uploaded videos to public/uploads folder (create folder if it doesn't exist)
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    
+    const uploadDir = path.join(process.cwd(), "public", "assets");
     await mkdir(uploadDir, { recursive: true });
 
-    const videoPaths: string[] = [];
+    const savedFiles: string[] = [];
 
-    // Ensure videos is an array, even if a single file was uploaded
-    const videoList = Array.isArray(files.videos) ? files.videos : [files.videos];
+    for (const file of files) {
+      if (typeof file === "object" && "arrayBuffer" in file && "name" in file) {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const filename = file.name.replaceAll(" ", "_");
+        const filepath = path.join(uploadDir, filename);
 
-    for (const file of videoList) {
-      // Read file from temporary path
-      const data = await readFile(file.filepath);
-      // Convert the Buffer to a Uint8Array to satisfy writeFile type requirements
-      const uint8Data = new Uint8Array(data);
-      // Use originalFilename or generate a fallback name
-      const fileName = file.originalFilename || `video-${Date.now()}`;
-      const filePath = path.join(uploadDir, fileName);
-      await writeFile(filePath, uint8Data);
-      videoPaths.push(`/uploads/${fileName}`);
+        await writeFile(filepath, buffer as any);
+        savedFiles.push(`/assets/${filename}`);
+      }
     }
+
+    //then post http://localhost:5000/detect by sending the video file and lines
+    const forwardFormData = new FormData();
+    // ✅ this works fine — File is a valid object
+    forwardFormData.append("file", files[0]);
+
+    if (lines) forwardFormData.append("lines", lines);
+    // const res = await axios.post("http://localhost:5000/detect", forwardFormData, {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    // });
+
+    //then look into your debugger
+    
 
     // 3. Return a JSON response with the parsed data and saved video URLs
     return NextResponse.json({
       message: "Upload success",
-      lines,
-      jobsData,
-      videoPaths,
+      // lines,
+      // jobsData,
+      // videoPaths,
     });
   } catch (err: any) {
     console.error("❌ Upload error:", err);

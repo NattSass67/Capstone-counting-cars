@@ -87,6 +87,7 @@ export default function NewJobStep2() {
           text="Confirm"
           showIconLeft={true}
             onClick={() => {
+              onSubmit()
               
             }}
           />
