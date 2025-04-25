@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import Alert from "@mui/material/Alert";
 import TaskStepBar from "@/components/bar/TaskStepBar";
 import ButtonK1 from "@/components/button/ButtonK1";
 import { useRouter } from "next/navigation";
@@ -21,9 +22,13 @@ export default function NewJobStep2() {
   const [lines, setLines] = useState<Line[]>([]);
   const [bgImage, setBgImage] = useState<string | null>(null);
 
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
   const onSubmit = async () => {
+    setAlertMessage(null); // Clear any previous alert
+
     if (!jobsData || !jobsData.video?.length || lines.length === 0) {
-      alert("กรุณาอัปโหลดวิดีโอและวาดเส้นก่อน");
+      setAlertMessage("กรุณาอัปโหลดวิดีโอและวาดเส้นก่อน");
       return;
     }
 
@@ -32,17 +37,14 @@ export default function NewJobStep2() {
       jobsData,
     };
 
-    // 1. Create FormData
     const formData = new FormData();
 
-    // 2. Append videos (File objects)
     payload.jobsData?.video?.forEach((vid, index) => {
       if (vid.video) {
-        formData.append("videos", vid.video); // multiple videos, same key
+        formData.append("videos", vid.video);
       }
     });
 
-    // 3. Append jobsData **without the File**
     const jobsDataWithoutFiles = {
       ...payload.jobsData,
       video: payload.jobsData?.video?.map(({ startTime, endTime }) => ({
@@ -51,7 +53,6 @@ export default function NewJobStep2() {
       })),
     };
 
-    // 4. Append the rest as JSON
     formData.append("lines", JSON.stringify(payload.lines));
     formData.append("jobsData", JSON.stringify(jobsDataWithoutFiles));
 
@@ -66,7 +67,7 @@ export default function NewJobStep2() {
       router.push("/test-uploader");
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+      setAlertMessage("เกิดข้อผิดพลาดในการส่งข้อมูล");
     }
   };
 
@@ -79,15 +80,17 @@ export default function NewJobStep2() {
   return (
     <div className="flex flex-col space-y-[16px] pt-16">
       <TaskStepBar stepNumber={2} stepText="ลาก counting line" totalStep={2} />
+
+      {alertMessage && (
+        <div className="px-4">
+          <Alert severity="error">{alertMessage}</Alert>
+        </div>
+      )}
+
       <DrawableBoard bgImage={bgImage} onChange={setLines} />
+
       <div className="flex justify-center pb-16">
-        <ButtonK1
-          text="Confirm"
-          showIconLeft={true}
-          onClick={() => {
-            onSubmit();
-          }}
-        />
+        <ButtonK1 text="Confirm" showIconLeft={true} onClick={onSubmit} />
       </div>
     </div>
   );
