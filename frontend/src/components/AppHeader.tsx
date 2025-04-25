@@ -9,7 +9,11 @@ export default function AppHeader() {
       <h1 className="font-bold text-amber-950 shadow-2xl self-center leading-none text-xl">
         {APPNAME}
       </h1>
-      <Icon className="bg-orange-800 w-[48px] h-[48px]" clickable={false}>
+      <Icon
+        className="bg-orange-800 w-[48px] h-[48px]"
+        clickable={true}
+        url="/howtouse"
+      >
         <IoIosInformationCircle size={32} color="white" />
       </Icon>
     </div>

@@ -11,7 +11,7 @@ export default function Icon({
   clickable?: boolean;
   url?: string;
 }) {
-  if (clickable) {
+  if (!clickable) {
     <div
       className={
         className + " flex items-center justify-center rounded-[900px]"
