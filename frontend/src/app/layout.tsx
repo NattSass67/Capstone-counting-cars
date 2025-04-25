@@ -34,11 +34,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col ">
           <AntdRegistry>
             <AppHeader />
             <Banner />
-            <Container className="w-full flex-grow">{children}</Container>
+            <Container className="w-screen flex-grow">{children}</Container>
             <AppFooter />
           </AntdRegistry>
         </div>

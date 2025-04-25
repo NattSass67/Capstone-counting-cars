@@ -12,6 +12,10 @@ export default function Home() {
     <div className="bg-white">
       {/* <AppHeader /> */}
       {/* <Banner /> */}
+      {/* <div className="w-screen flex justify-center items-center">
+        <Banner />
+      </div> */}
+
       <div className="flex flex-col space-y-[64px] px-[64px] py-[64px]">
         <FeatureSection />
         <div className="flex flex-col space-y-[32px]">
