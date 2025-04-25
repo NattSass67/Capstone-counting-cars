@@ -19,6 +19,8 @@ export default function NewJobStep1() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const { jobsData, setJobsData, resetJobsData, addJobsData, removeJobData } =
+    useJobsDataStore();
 
   const router = useRouter();
 
@@ -30,10 +32,12 @@ export default function NewJobStep1() {
   const reducer = (state: number, action: { type: string }) => {
     switch (action.type) {
       case ADD_VIDEO:
+        addJobsData()
         return state + 1;
       case RESET_VIDEOS:
         return 4; // Reset to default count
       case REMOVE_VIDEO:
+        removeJobData()
         return state - 1;
       default:
         return state;
@@ -43,8 +47,6 @@ export default function NewJobStep1() {
   const [videoCount, dispatch] = useReducer(reducer, 4, (initial) => {
     return Number(localStorage.getItem("videoCount")) || initial;
   });
-
-  const { jobsData, setJobsData, resetJobsData } = useJobsDataStore();
 
   const onFormChange = (
     data: any,
@@ -56,10 +58,7 @@ export default function NewJobStep1() {
 
     if (type === "array" && arrayIndex !== undefined) {
       const newJobsData = [...(jobsData[path] as any[])];
-      newJobsData[arrayIndex] = {
-        ...newJobsData[arrayIndex],
-        [path]: data,
-      };
+      newJobsData[arrayIndex] = data;
       setJobsData({
         ...jobsData,
         [path]: newJobsData,
@@ -73,7 +72,7 @@ export default function NewJobStep1() {
   //   dispatch({ type: RESET_VIDEOS, payload: savedCount }); // Update videoCount
   // }, []);
   useEffect(() => {
-    resetJobsData();
+    //resetJobsData();
     localStorage.setItem("videoCount", videoCount.toString());
   }, [videoCount]);
 
@@ -131,6 +130,7 @@ export default function NewJobStep1() {
                 index={index}
                 totalVideo={videoCount}
                 onChange={(data) => onFormChange(data, "video", "array", index)}
+                currentVideo={jobsData?.video?.[index]?.video}
                 onDelete={(index: number) => {
                   // dispatch({ type: REMOVE_VIDEO });
                   handleShow();

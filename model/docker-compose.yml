@@ -1,13 +1,19 @@
-version: '3'
 services:
   flask:
     build:
       context: .
-      dockerfile: dev.Dockerfile  # Specify custom Dockerfile
+      dockerfile: dev.Dockerfile
     ports:
       - "5000:5000"
     volumes:
-      - .:/app  # Mount current directory to /app in the container
+      - .:/app
     environment:
-      - FLASK_ENV=development  # Enable hot-reload for Flask
-      - FLASK_DEBUG=1  # Enables debug mode
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
