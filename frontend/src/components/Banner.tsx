@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 
 export default function Banner() {
   const pathname = usePathname();
-  const show = !(pathname.includes("newjob") || pathname.includes("howtouse"));
+  const hiddenList = ["newjob", "howtouse", "result"];
+  const show = !hiddenList.some((path) => pathname.includes(path));
 
   if (!show) return null;
   return (
