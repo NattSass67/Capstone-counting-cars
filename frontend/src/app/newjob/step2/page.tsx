@@ -18,7 +18,7 @@ export default function NewJobStep2() {
   const { jobsData } = useJobsDataStore();
   const file = jobsData?.video?.[0]?.video;
 
-  const [lines, setLines]=useState<Line[]>([])
+  const [lines, setLines] = useState<Line[]>([]);
   const [bgImage, setBgImage] = useState<string | null>(null);
 
   const onSubmit = async () => {
@@ -26,22 +26,22 @@ export default function NewJobStep2() {
       alert("กรุณาอัปโหลดวิดีโอและวาดเส้นก่อน");
       return;
     }
-  
+
     const payload = {
       lines,
       jobsData,
     };
-  
+
     // 1. Create FormData
     const formData = new FormData();
-  
+
     // 2. Append videos (File objects)
     payload.jobsData?.video?.forEach((vid, index) => {
       if (vid.video) {
         formData.append("videos", vid.video); // multiple videos, same key
       }
     });
-  
+
     // 3. Append jobsData **without the File**
     const jobsDataWithoutFiles = {
       ...payload.jobsData,
@@ -50,18 +50,18 @@ export default function NewJobStep2() {
         endTime,
       })),
     };
-  
+
     // 4. Append the rest as JSON
     formData.append("lines", JSON.stringify(payload.lines));
     formData.append("jobsData", JSON.stringify(jobsDataWithoutFiles));
-  
+
     try {
       const response = await axios.post("/api/jobs", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
+
       console.log("Upload success:", response.data);
       router.push("/test-uploader");
     } catch (err) {
@@ -70,27 +70,24 @@ export default function NewJobStep2() {
     }
   };
 
-
   useEffect(() => {
     if (file) {
       getVideoThumbnail(file).then(setBgImage).catch(console.error);
     }
   }, [file]);
 
-
   return (
     <div className="flex flex-col space-y-[16px] pt-16">
-      <TaskStepBar stepNumber={2} stepText="ลาก counting line" totalStep={3} />
-      <DrawableBoard bgImage={bgImage} onChange={setLines}/>
+      <TaskStepBar stepNumber={2} stepText="ลาก counting line" totalStep={2} />
+      <DrawableBoard bgImage={bgImage} onChange={setLines} />
       <div className="flex justify-center pb-16">
         <ButtonK1
           text="Confirm"
           showIconLeft={true}
-            onClick={() => {
-              onSubmit()
-              
-            }}
-          />
+          onClick={() => {
+            onSubmit();
+          }}
+        />
       </div>
     </div>
   );

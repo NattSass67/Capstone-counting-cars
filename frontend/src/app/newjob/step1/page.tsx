@@ -32,12 +32,12 @@ export default function NewJobStep1() {
   const reducer = (state: number, action: { type: string }) => {
     switch (action.type) {
       case ADD_VIDEO:
-        addJobsData()
+        addJobsData();
         return state + 1;
       case RESET_VIDEOS:
         return 4; // Reset to default count
       case REMOVE_VIDEO:
-        removeJobData()
+        removeJobData();
         return state - 1;
       default:
         return state;
@@ -78,16 +78,16 @@ export default function NewJobStep1() {
 
   return (
     <div className="flex flex-col space-y-[16px] pt-16 ">
-      <TaskStepBar stepNumber={1} stepText="สร้างงานใหม่" totalStep={3} />
+      <TaskStepBar stepNumber={1} stepText="สร้างงานใหม่" totalStep={2} />
       <h1 className="text-amber-950 font-bold text-xl px-[64px]">
         กรอกข้อมูลเกี่ยวกับชุดข้อมูล
       </h1>
-      <form action="" className="flex flex-col space-y-[16px] px-[64px]">
-        <div className="w-full max-w-3xl mx-auto p-4">
+      <form action="" className="flex flex-col space-y-[16px] px-[48px]">
+        <div className="w-full max-w-4xl mx-auto p-4">
           <div className="flex flex-row space-x-[8px] items-center mb-2">
-            <div className="flex flex-row w-[30%]">
+            <div className="flex flex-row w-[40%]">
               <h1 className="text-xl text-amber-950 ">
-                Intersection Name (ชื่อเเยก):
+                Intersection/Road Name (ชื่อเเยก/ถนน):
               </h1>
             </div>
             <input
@@ -101,7 +101,7 @@ export default function NewJobStep1() {
             />
           </div>
           <div className="flex flex-row space-x-[8px] items-center mb-2">
-            <div className="flex flex-row w-[30%] ">
+            <div className="flex flex-row w-[40%] ">
               <h1 className="text-xl text-amber-950">Date (วัน/เดือน/ปี):</h1>
             </div>
             <DatePicker
@@ -110,7 +110,7 @@ export default function NewJobStep1() {
             />
           </div>
           <div className="flex flex-row space-x-[8px] items-center mb-2">
-            <div className="flex flex-row w-[30%]">
+            <div className="flex flex-row w-[40%]">
               <h1 className="text-xl text-amber-950 ">Direction (ทิศทาง):</h1>
             </div>
             <input
