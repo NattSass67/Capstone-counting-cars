@@ -30,16 +30,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
-        <AntdRegistry>
-          <AppHeader />
-          <Banner />
-          <Container className="w-full">{children}</Container>
-          <AppFooter />
-        </AntdRegistry>
+        <div className="min-h-screen flex flex-col">
+          <AntdRegistry>
+            <AppHeader />
+            <Banner />
+            <Container className="w-full flex-grow">{children}</Container>
+            <AppFooter />
+          </AntdRegistry>
+        </div>
       </body>
     </html>
   );
