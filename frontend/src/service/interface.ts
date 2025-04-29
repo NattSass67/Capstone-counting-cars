@@ -32,3 +32,16 @@ export interface VideoData {
   startTime: string;
   endTime: string;
 }
+
+export interface singleSubjobResult {
+  sjid: string;
+  intersectionName: string;
+  date: Dayjs;
+  direction: string;
+  startTime: string;
+  stopTime: string;
+  type1: number;
+  type2: number;
+  type3: number;
+  type4: number;
+}
