@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
 
     const lines = JSON.parse(formData.get("lines") as string);
     const jobsData = JSON.parse(formData.get("jobsData") as string);
-    console.log(lines);
     console.log(jobsData);
 
     const uploadDir = path.join(process.cwd(), "public", "assets");
@@ -44,6 +43,16 @@ export async function POST(req: NextRequest) {
       line.start,
       line.end,
     ]);
+
+    const jobres = await axios.post("http://localhost:1337/api/jobs", {
+      data: {
+       name: 'Job 01',
+       ...jobsData
+      },
+    });
+
+    const jobId = jobres.data.data?.id;
+
     const savedFiles: string[] = [];
 
     for (const file of files) {
@@ -57,12 +66,14 @@ export async function POST(req: NextRequest) {
         savedFiles.push(`/assets/${filename}`);
 
         // Add job to the global queue
+
         //addJob({ videoPath: publicPath, line: simplifiedLines, status: "halt" });
         await axios.post("http://localhost:1337/api/tasks", {
           data: {
             videoPath: publicPath,
             line: simplifiedLines,
             taskStatus: "pending",
+            job: jobId,
           },
         });
         

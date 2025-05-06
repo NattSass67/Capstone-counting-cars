@@ -1,5 +1,6 @@
 # ml/yolo_model.py
 
+import requests
 import cv2
 import os
 from ultralytics import YOLO
@@ -51,7 +52,7 @@ def get_result(lines_crossed):
     result = {}
     for track_id, data in lines_crossed.items():
         label = data["label"]
-        key = data["crossings"]
+        key = tuple(data["crossings"])
         if key not in result:
             result[key] = {}
         if label not in result[key]:
@@ -59,12 +60,8 @@ def get_result(lines_crossed):
         result[key][label] += 1
     return result
 
-
-
-
-    
 # lines = [(line_name,(x1, y1), (x2, y2)),...]
-def process_video_frames_deepSort(video_path, lines):
+def process_video_frames_deepSort(video_path, lines, job_id):
     print("process_video_deepsort_called")
     original_width = 1280  # Original video width
     original_height = 720  # Original video height
@@ -80,6 +77,7 @@ def process_video_frames_deepSort(video_path, lines):
     label_counts_out = {}  # label -> out count
     previous_centroids = {}  # track_id -> previous centroid
     lines_crossed = {}
+    lines_without_names = [(start, end) for _, start, end in lines]
     # Initialize DeepSort
     tracker = DeepSort(max_age=30,bgr=False)
     while cap.isOpened():
@@ -90,7 +88,7 @@ def process_video_frames_deepSort(video_path, lines):
         frame_count += 1
         if frame_count % frame_skip != 0:
             continue  # Skip this frame
-        results = model(frame)
+        results = model(frame, classes=[2,3,5,7])
 
         # Prepare detections for DeepSort
         detections = []
@@ -146,8 +144,6 @@ def process_video_frames_deepSort(video_path, lines):
             if track_id in previous_centroids:
                 for line_id, (line_name, line_start, line_finish) in enumerate(lines):
                     prev_centroid = previous_centroids[track_id]
-                    
-                    line_start, line_finish = lines[line_name]
     
                     First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
 
@@ -157,7 +153,7 @@ def process_video_frames_deepSort(video_path, lines):
 
                         elif len(lines_crossed[track_id]["crossings"]) == 2:
                             lines_crossed[track_id]["crossings"].pop()
-                            lines_crossed[track_id]["crossings"].append((line_name))
+                        lines_crossed[track_id]["crossings"].append((line_name))
                 
 
             # Update previous centroid
@@ -175,16 +171,16 @@ def process_video_frames_deepSort(video_path, lines):
         socketio.emit('frame-processed', {
             'frame': frame_base64,
             'detections': detections_to_send,
-            'lines': lines,
+            'lines': lines_without_names,
             'Result': Result
         })
-
-        eventlet.sleep(0.001)
+        eventlet.sleep(0)
     
     Result = get_result(lines_crossed)
-    print("Result",Result)
+
     cap.release()
     print("Video processing completed.")
+    return Result
 
     
 #Using track.mean could allow one to ascertain the velocity, but let's do the velocity from just positions alone.

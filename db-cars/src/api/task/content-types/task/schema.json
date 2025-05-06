@@ -19,10 +19,21 @@
     },
     "taskStatus": {
       "type": "enumeration",
-      "enum": ["pending", "processing", "done", "error"]
+      "enum": [
+        "pending",
+        "processing",
+        "done",
+        "error"
+      ]
     },
     "result": {
       "type": "json"
+    },
+    "job": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::job.job",
+      "inversedBy": "tasks"
     }
   }
 }
