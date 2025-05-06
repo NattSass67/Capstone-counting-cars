@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
 
     const uploadDir = path.join(process.cwd(), "public", "assets");
     await mkdir(uploadDir, { recursive: true });
-    const simplifiedLines = lines.map((line: { start: any; end: any }) => [
+    const simplifiedLines = lines.map((line: { name: any; start: any; end: any }) => [
+      line.name,
       line.start,
       line.end,
     ]);
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
 
         // Add job to the global queue
         //addJob({ videoPath: publicPath, line: simplifiedLines, status: "halt" });
-        await axios.post("http://localhost:1337/api/jobs", {
+        await axios.post("http://localhost:1337/api/tasks", {
           data: {
             videoPath: publicPath,
             line: simplifiedLines,

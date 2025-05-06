@@ -24,6 +24,12 @@ def line_constants(line_starts, line_finishes):
 def cross_line(pos1,pos2, line_start, line_finish):
     box = min(line_start[0],line_finish[0])-40, max(line_start[0],line_finish[0])+40, min(line_start[1],line_finish[1])-40, max(line_start[1],line_finish[1])+40
     within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
+    #Within the box.
+    #The line is ax1 + by1 = c, ax2+by2 = c
+    # a(x1-x2) + b(y1-y2) = 0
+    # a = -b(y2-y1)/(x2-x1)
+    # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
+    #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
     if not within_box: return 0,0
     
     a = line_finish[1]-line_start[1]
@@ -37,6 +43,14 @@ def cross_line(pos1,pos2, line_start, line_finish):
     return first_line_geq , second_line_geq
 
 def cross_line_numpy(pos1,pos2, abc):
+    #box = min(line_start[0],line_finish[0])-40, max(line_start[0],line_finish[0])+40, min(line_start[1],line_finish[1])-40, max(line_start[1],line_finish[1])+40
+    #within_box = box[0]<=pos1[0]<=box[1] and box[0]<=pos2[0]<=box[1] and box[2]<=pos1[1]<=box[3] and box[2]<=pos2[1]<=box[3]
+    #Within the box.
+    #The line is ax1 + by1 = c, ax2+by2 = c
+    # a(x1-x2) + b(y1-y2) = 0
+    # a = -b(y2-y1)/(x2-x1)
+    # Let a = (y2-y1), b = (x1-x2). This satisfies the equation.
+    #  x1y2 - x1y1 + x1y1 - y1x2 = x1y2 - y1x2 = c = x2y2-x2y1 + x1y2 - x2y2
     
     a,b,c = abc
     
@@ -49,9 +63,8 @@ def cross_line_numpy(pos1,pos2, abc):
 
 def get_result(lines_crossed):
     result = {}
-    for track_id, data in lines_crossed.items():
-        label = data["label"]
-        key = data["crossings"]
+    for (track_id, label), crossings in lines_crossed.items():
+        key = tuple(crossings)  # ใช้ tuple แทน list เพื่อให้ใช้เป็น dictionary key ได้
         if key not in result:
             result[key] = {}
         if label not in result[key]:
@@ -61,9 +74,8 @@ def get_result(lines_crossed):
 
 
 
-
     
-# lines = [(line_name,(x1, y1), (x2, y2)),...]
+# lines = [((x1, y1), (x2, y2)),...]
 def process_video_frames_deepSort(video_path, lines):
     print("process_video_deepsort_called")
     original_width = 1280  # Original video width
@@ -82,6 +94,27 @@ def process_video_frames_deepSort(video_path, lines):
     lines_crossed = {}
     # Initialize DeepSort
     tracker = DeepSort(max_age=30,bgr=False)
+    
+    #line_starts = np.linspace(200, 500,100)
+    #line_stops = np.linspace(200, 500,100)
+    #line_starts,line_stops = np.meshgrid(line_starts,line_stops)
+    #line_starts = line_starts.reshape(-1)
+    #line_stops = line_stops.reshape(-1)
+    #line_grid_SHAPE = line_starts.shape[0]
+    #print(line_starts.shape)
+    #print(line_stops.shape)
+    #if line_orientation == "horizontal":
+    #    line_starts = np.stack((np.full(line_starts.shape,0),line_starts),axis=1)
+    #    line_stops = np.stack((np.full(line_stops.shape,original_width),line_stops),axis=1)
+    #else:
+    #    line_starts = np.stack((line_starts,np.full(line_starts.shape,0)),axis=1)
+    #    line_stops = np.stack((line_starts,np.full(line_stops.shape,original_height)),axis=1)
+    #abcs = line_constants(line_starts, line_stops)
+    #out_crossings, in_crossings = np.zeros(line_grid_SHAPE),np.zeros(line_grid_SHAPE)
+    #out_crossed = {}
+    #in_crossed = {}
+    #in_crossing_labelled = {}
+    #out_crossing_labelled = {}
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -90,6 +123,10 @@ def process_video_frames_deepSort(video_path, lines):
         frame_count += 1
         if frame_count % frame_skip != 0:
             continue  # Skip this frame
+
+        #resized_frame = cv2.resize(frame, (yolo_input_size, yolo_input_size))
+
+        # Perform object detection using YOLOv8 on the resized frame
         results = model(frame)
 
         # Prepare detections for DeepSort
@@ -144,25 +181,61 @@ def process_video_frames_deepSort(video_path, lines):
             
             
             if track_id in previous_centroids:
-                for line_id, (line_name, line_start, line_finish) in enumerate(lines):
+                for line_id, (line_start, line_finish) in enumerate(lines):
                     prev_centroid = previous_centroids[track_id]
+                    #new_out_crosses, new_in_crosses = cross_line_numpy(prev_centroid, centroid, abcs)
                     
-                    line_start, line_finish = lines[line_name]
+                    #if label not in in_crossing_labelled:
+                    #    in_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    #if label not in out_crossing_labelled:
+                    #    out_crossing_labelled[label] = np.zeros(line_grid_SHAPE)
+                    
+                    #if track_id not in out_crossed:
+                    #    out_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    #if track_id not in in_crossed:
+                    #    in_crossed[track_id] = np.zeros(line_grid_SHAPE)
+                    
+                    #out_crossings += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossing_labelled[label] += np.logical_and(np.logical_not(out_crossed[track_id]),new_out_crosses)
+                    #out_crossed[track_id] = np.logical_or(out_crossed[track_id],new_out_crosses)
+                    #in_crossings += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossing_labelled[label] += np.logical_and(np.logical_not(in_crossed[track_id]),new_in_crosses)
+                    #in_crossed[track_id] = np.logical_or(in_crossed[track_id],new_in_crosses)
+                    #in_crossings += new_in_crosses
+                    
+                    line_start, line_finish = lines[line_id]
+
     
                     First,Second = cross_line(prev_centroid, centroid, line_start, line_finish)
 
                     if First != Second:
-                        if track_id not in lines_crossed:
-                            lines_crossed[track_id] = {"label": label, "crossings": []}
-
-                        elif len(lines_crossed[track_id]["crossings"]) == 2:
-                            lines_crossed[track_id]["crossings"].pop()
-                            lines_crossed[track_id]["crossings"].append((line_name))
+                        if (track_id, label) not in lines_crossed:
+                            lines_crossed[(track_id, label)] = []
+                        elif len(lines_crossed[(track_id, label)]) == 2:
+                            lines_crossed[(track_id, label)].pop()
+                        if First == 1:  # "In" crossing
+                            lines_crossed[(track_id,label)].append(("in",line_id))
+                        else:  # "Out" crossing
+                            lines_crossed[(track_id,label)].append(("out",line_id))
                 
 
             # Update previous centroid
             previous_centroids[track_id] = centroid
             
+        
+        #print({i:j for (i,j) in lines_crossed.items() if len(j)>1})
+        #print("Out and in crossings")
+        #out_line_loc = out_crossings.argsort()[-1000]
+        #in_line_loc = in_crossings.argsort()[-1000]
+        #print({i:j[out_line_loc] for i,j in out_crossing_labelled.items()})
+        #print({i:j[in_line_loc] for i,j in in_crossing_labelled.items()})
+        
+        #print(out_crossings.max())
+        #print(in_crossings.max())
+        #print(out_crossings.argmax())
+        #print(in_crossings.argmax())
+        #print(line_starts[out_crossings.argmax()])
+        #print(line_stops[out_crossings.argmax()])
         
         # Print updated label counts
         print(f"Current crossing counts: {Result}")

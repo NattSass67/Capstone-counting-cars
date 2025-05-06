@@ -6,7 +6,7 @@ import fs from "fs/promises";
 const INTERVAL_MS = 10_000; // 10 seconds
 
 async function dispatchJob() {
-  const res = await axios.get("http://localhost:1337/api/jobs", {
+  const res = await axios.get("http://localhost:1337/api/tasks", {
     params: {
       filters: { taskStatus: { $eq: "pending" } },
       pagination: { page: 1, pageSize: 1 },
@@ -15,12 +15,14 @@ async function dispatchJob() {
 
   const job = res.data.data[0];
   if (!job) return;
-
+  if (!job || !job.videoPath || !job.line) {
+    throw new Error("Invalid job data");
+  }
   const jobId = job.id;
-  const { videoPath, line } = job.attributes;
+  const { videoPath, line } = job;
 
   // 2. Mark as processing
-  await axios.put(`http://localhost:1337/api/jobs/${jobId}`, {
+  await axios.put(`http://localhost:1337/api/tasks/${jobId}`, {
     data: { taskStatus: "processing" },
   });
 
@@ -39,12 +41,12 @@ async function dispatchJob() {
     });
 
     // 4. Mark as done
-    await axios.put(`http://localhost:1337/api/jobs/${jobId}`, {
+    await axios.put(`http://localhost:1337/api/tasks/${jobId}`, {
       data: { taskStatus: "done", result: result.data },
     });
   } catch (error) {
     // 5. Mark as error
-    await axios.put(`http://localhost:1337/api/jobs/${jobId}`, {
+    await axios.put(`http://localhost:1337/api/tasks/${jobId}`, {
       data: { taskStatus: "error" },
     });
   }

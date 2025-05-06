@@ -26,7 +26,7 @@ def upload_video():
     # Load lines as before
     lines_json = request.form.get("lines")
     lines = json.loads(lines_json) if lines_json else []
-    lines = [(tuple(start), tuple(end)) for start, end in lines]
+    lines = [(name,tuple(start), tuple(end)) for name, start, end in lines]
 
     # Save and process each video
     video_paths = []

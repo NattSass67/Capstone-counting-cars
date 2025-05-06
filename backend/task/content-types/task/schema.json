@@ -5,7 +5,7 @@
     "singularName": "task",
     "pluralName": "tasks",
     "displayName": "Task",
-    "description": "Tasks for managing jobs"
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -19,7 +19,12 @@
     },
     "taskStatus": {
       "type": "enumeration",
-      "enum": ["pending", "processing", "done", "error"]
+      "enum": [
+        "pending",
+        "processing",
+        "done",
+        "error"
+      ]
     },
     "result": {
       "type": "json"

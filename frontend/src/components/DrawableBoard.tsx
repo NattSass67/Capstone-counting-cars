@@ -94,7 +94,7 @@ export default function DrawableBoard({ bgImage = "", ...props }: Props) {
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="overflow-auto border rounded-lg shadow-md p-2 max-w-full flex justify-center">
+      <div className="overflow-auto border rounded-lg shadow-md p-2 flex items-center">
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}

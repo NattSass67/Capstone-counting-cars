@@ -542,7 +542,7 @@ export interface ApiJobJob extends Struct.CollectionTypeSchema {
     singularName: 'job';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -562,13 +562,13 @@ export interface ApiJobJob extends Struct.CollectionTypeSchema {
 export interface ApiTaskTask extends Struct.CollectionTypeSchema {
   collectionName: 'tasks';
   info: {
-    description: '';
+    description: 'Tasks for managing jobs';
     displayName: 'Task';
     pluralName: 'tasks';
     singularName: 'task';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
