@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tasks",
+  "info": {
+    "singularName": "task",
+    "pluralName": "tasks",
+    "displayName": "Task",
+    "description": "Tasks for managing jobs"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "videoPath": {
+      "type": "text"
+    },
+    "line": {
+      "type": "json"
+    },
+    "taskStatus": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "processing",
+        "done",
+        "error"
+      ]
+    },
+    "result": {
+      "type": "json"
+    },
+    "job": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::job.job",
+      "inversedBy": "tasks"
+    }
+  }
+}

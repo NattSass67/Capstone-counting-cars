@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "jobs",
+  "info": {
+    "singularName": "job",
+    "pluralName": "jobs",
+    "displayName": "Job",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "tasks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::task.task",
+      "mappedBy": "job"
+    },
+    "intersectionName": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "direction": {
+      "type": "string"
+    },
+    "video": {
+      "type": "json"
+    }
+  }
+}

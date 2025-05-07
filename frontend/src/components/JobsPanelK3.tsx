@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { jobK2, jobTable } from "@/service/interface";
 import dayjs, { Dayjs } from "dayjs";
 import ButtonK1 from "./button/ButtonK1";
@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 
 import { MdOutlineFileDownload } from "react-icons/md";
 import useJobsProcessingDataStore from "@/stores/processsing-jobs/processing-jobs";
+import * as XLSX from 'xlsx';
+import axios from "axios";
 
 export default function JobsPanelK3() {
   //state 0 = pending, 1 = finished, 2 = fail
@@ -105,56 +107,97 @@ export default function JobsPanelK3() {
       ],
     },
   ];
-  // let mockrow = [];
-  // for (let i = 0; i < mockdata.length; i++) {
-  //   let tempdata: jobTable = {
-  //     id: mockdata[i].id,
-  //     name: "งาน " + i,
-  //     intersectionName: mockdata[i].intersectionName,
-  //     date: formatThaiDate(mockdata[i].date),
-  //     countingState: "Pending...",
-  //   };
-  //   // Logic of checking if some process failed or not, change later
-  //   let sumState = 0;
-  //   let count0 = 0;
-  //   let count1 = 0;
-  //   let count2 = 0;
-  //   for (let j = 0; j < mockdata[i].subjob.length; j++) {
-  //     // sumState += mockdata[i].subjob[j].status;
-  //     if (mockdata[i].subjob[j].status == 0) {
-  //       count0++;
-  //     } else if (mockdata[i].subjob[j].status == 1) {
-  //       count1++;
-  //     } else if (mockdata[i].subjob[j].status == 2) {
-  //       count2++;
-  //     }
-  //   }
-  //   if (count0 == 4) {
-  //     tempdata.countingState = "Pending...";
-  //   } else if (count1 == 4) {
-  //     tempdata.countingState = "Finished";
-  //   } else if (count2 == 4) {
-  //     tempdata.countingState = "All Process Failed";
-  //   } else {
-  //     tempdata.countingState = "Some Process Failed";
-  //   }
-  //   mockrow.push(tempdata);
-  // }
-  // let numJobs = mockdata.length;
+
+
 
   const [selectedItem, setSelectedItem] = useState<jobTable | null>(null);
+  const [jobsData, setJobsData] = useState<Job[]>([]);
 
-  const data = jobsProcessingData.map((item, index) => {
+  const getJob = async () => {
+    const jobres = await axios.get<JobResponse>("http://localhost:1337/api/jobs/summary");
+    console.log(jobres)
+    setJobsData(jobres.data.data)
+  }
+  
+  useEffect(() => {
+      getJob()
+  }, [])
+
+
+
+const Download = async (job: any) => {
+  try {
+    const res = await axios.get(`http://localhost:1337/api/tasks`, {
+      params: {
+        filters: { job: job.id },
+      },
+    });
+
+    const tasks = res.data.data.map((item: any) => ({
+      id: item.id,
+      ...item,
+    }));
+
+    const sheetNames = new Set<string>();
+    tasks.forEach((task:any) => {
+      if (task.result) {
+        Object.keys(task.result).forEach((key) => {
+            sheetNames.add(key);
+        });
+      }
+    });
+    const sheets: { [sheetName: string]: any[][] } = {};
+
+    sheetNames.forEach((line) => {
+      const sheetData: any[][] = [];
+      sheetData.push(['ช่วงเวลา', 'Car', 'Truck', 'Bus', 'Motorcycle']);
+
+      tasks.forEach((task: any, index: string | number) => {
+        const lineResult = task.result?.[line] || {};
+        const timeRange = `${job.time?.[index]?.startTime ?? '-'} - ${job.time?.[index]?.endTime ?? '-'}`;
+
+        sheetData.push([
+          timeRange,
+          lineResult.car ?? 0,
+          lineResult.truck ?? 0,
+          lineResult.bus ?? 0,
+          lineResult.motorcycle ?? 0,
+        ]);
+      });
+
+      sheets[line] = sheetData;
+    });
+
+    const workbook = XLSX.utils.book_new();
+    for (const sheetName in sheets) {
+      const ws = XLSX.utils.aoa_to_sheet(sheets[sheetName]);
+      XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+    }
+
+    XLSX.writeFile(
+      workbook,
+      `job_${job.intersectionName?.replace(/\s+/g, '_') || 'unknown'}_${job.date || 'no_date'}.xlsx`
+    );    
+  } catch (err) {
+    console.error('Error exporting Excel:', err);
+  }
+};
+
+  
+
+  const data = jobsData.map((item, index) => {
     return {
-      id: index,
+      id: item.id,
       name: "งาน " + index,
       intersectionName: item.intersectionName as string,
       date: item.date as string,
       direction: item.direction as string,
-      countingState: "Processing...",
+      countingState: item.countingStatus,
+      time: item.video
     };
   });
 
+  // const Download = 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
     {
@@ -172,7 +215,7 @@ export default function JobsPanelK3() {
       title: "Action",
       render: (_: unknown, record: jobTable) => (
         <div className="flex flex-row space-x-[24px]">
-          <Button onClick={() => setSelectedItem(record)}>View Details</Button>
+          <Button onClick={() => Download(record)}>Download CSV</Button>
           <Button
             onClick={() =>
               setJobsProcessingData(
@@ -192,7 +235,7 @@ export default function JobsPanelK3() {
       <div className="flex flex-row justify-between items-center px-[32px] py-[16px]">
         <div className="flex flex-row grow-0 space-x-[8px] text-amber-950">
           <h1 className="text-3xl font-bold">
-            {"Jobs (" + jobsProcessingData.length + ")"}
+            {"Jobs (" + data.length + ")"}
           </h1>
         </div>
         <div>
@@ -216,7 +259,7 @@ export default function JobsPanelK3() {
         />
       </div>
 
-      <div className="pt-[32px]">
+      {/* <div className="pt-[32px]">
         <div className="w-full flex-col flex px-[32px] py-[16px] border-t-[1px] border-amber-950">
           {selectedItem ? (
             <div className="flex flex-col space-y-[24px] text-amber-950">
@@ -269,7 +312,44 @@ export default function JobsPanelK3() {
             <h1 className="text-2xl font-bold text-amber-950">Select A Job</h1>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
+}
+
+
+
+interface JobVideo {
+  startTime: string;
+  endTime: string;
+}
+
+interface Job {
+  id: number;
+  documentId: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  intersectionName: string | null;
+  date: string | null;
+  direction: string | null;
+  video: JobVideo[] | null;
+  countingStatus: string;
+}
+
+interface Pagination {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+}
+
+interface Meta {
+  pagination: Pagination;
+}
+
+interface JobResponse {
+  data: Job[];
+  meta: Meta;
 }

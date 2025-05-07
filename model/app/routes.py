@@ -17,36 +17,51 @@ main = Blueprint('main', __name__)
 
 @main.route('/detect', methods=['POST'])
 def upload_video():
-    # Handle video upload
-    print("Triggered")
-    video_files = request.files.getlist("videos")
-    if not video_files:
-        return jsonify({'error': 'No video files provided'}), 400
+    try:
+        print("Triggered")
+        video_files = request.files.getlist("videos")
+        if not video_files:
+            print('No video files provided')
+            return jsonify({'error': 'No video files provided'}), 400
+        
+        job_id = request.form.get("jobId")
+        if not job_id:
+            print('Missing jobId')
+            return jsonify({'error': 'Missing jobId'}), 400
 
-    # Load lines as before
-    lines_json = request.form.get("lines")
-    lines = json.loads(lines_json) if lines_json else []
-    lines = [(tuple(start), tuple(end)) for start, end in lines]
+        # Load lines as before
+        lines_json = request.form.get("lines")
+        lines = json.loads(lines_json) if lines_json else []
+        lines = [(name, tuple(start), tuple(end)) for name, start, end in lines]
 
-    # Save and process each video
-    video_paths = []
-    for video_file in video_files:
-        video_path = os.path.join('uploads', video_file.filename)
-        video_file.save(video_path)
-        video_paths.append(video_path)
-        # Run async background task for each video
-        # socketio.start_background_task(process_video_frames_deepSort, video_path, lines)
+        # Save and process each video
+        video_paths = []
+        for video_file in video_files:
+            video_path = os.path.join('uploads', video_file.filename)
+            video_file.save(video_path)
+            video_paths.append(video_path)
 
-    socketio.start_background_task(process_all_videos, video_paths, lines)
+        # Process the videos and get the result
+        result_data = process_all_videos(video_paths, lines, job_id)
+        result = {
+            ', '.join(k) if isinstance(k, tuple) else str(k): v
+            for k, v in result_data.items()
+        }
+        print("Processed result:", result)
+        return jsonify(result), 200
 
-    
-    return jsonify({'status': 'Video uploaded and processing started'}), 200
 
-def process_all_videos(video_paths, lines):
+    except Exception as e:
+        print(f"Error in upload_video: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+def process_all_videos(video_paths, lines, job_id):
     for path in video_paths:
-        print(f"[START] {path}")
-        process_video_frames_deepSort(path, lines)
-        print(f"[DONE] {path}")
+            print(f"🔄 Processing video: {path} for job: {job_id}")
+            video_result = process_video_frames_deepSort(path, lines, job_id)
+            return video_result
+
+
 
 @main.route('/train', methods=['POST'])
 def train():
